@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>夏虫的博客使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+<body>
+    <div class="container">
+
+    <main>
+      <header>
+    <div class="menu">
+        <ul>
+            <li><a href="/">最新</a></li>
+            <li><a href="/categories.html">分类</a></li>
+            <li><a href="/tags.html">标签</a></li>
+            <li><a href="/collections.html">专题</a></li>
+        </ul>
+    </div>
+</header><h1 id="使用-travis-ci--jekyll--github-pages-搭建个人博客">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</h1>
+
+<p>一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。</p>
+
+<p>Github Pages 的整个搭建过程其实并不复杂，但无奈网上的文章坑太多，让我在搭建的过程中走了不少弯路，于是计划新写一篇文章来好好的总结一下整个搭建过程。</p>
+
+<p>太长不看版：</p>
+
+<blockquote>
+  <p>直接 fork 我这个项目 <a href="https://github.com/trojanbox/trojanbox.github.io.travis">https://github.com/trojanbox/trojanbox.github.io.travis</a>。write 为文章分支，pages 使用 master 分支发布。</p>
+</blockquote>
+
+<hr />
+
+<p>好了不扯皮，现在进入正题：</p>
+
+<ol>
+  <li>什么是 Github Pages</li>
+  <li>什么是 Travis Ci</li>
+  <li>为什么使用 Travis Ci 进行构建</li>
+  <li>搭建</li>
+</ol>
+
+<h2 id="什么是-github-pages">什么是 Github Pages</h2>
+
+<blockquote>
+  <p>GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。</p>
+</blockquote>
+
+<p>构建过程运行文件就是 github 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 格式内容并交给 Jekyll 来解析，自动生成静态文件。</p>
+
+<p>同时，网上的很多文章并没有介绍清除，其实 Github Pages 提供了三种类型的仓库项目、用户和组织（因为太懒，没有直接读官方的中文文档，导致踩了不少坑）：</p>
+
+<ol>
+  <li>用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 <code class="highlighter-rouge">&lt;user&gt;.github.io</code> 或 <code class="highlighter-rouge">&lt;organization&gt;.github.io</code> 的项目。你就可以直接通过 <code class="highlighter-rouge">http(s)://&lt;username&gt;.github.io</code> 或 <code class="highlighter-rouge">http(s)://&lt;organization&gt;.github.io</code>。
+需要注意：这种类型的项目，只能使用 <code class="highlighter-rouge">master</code> 分支发布。</li>
+  <li>项目站点：项目站点的源文件与其项目存储在同一个仓库中的，这种一般使用 <code class="highlighter-rouge">gh-pages</code> 分支发布，访问方式为 <code class="highlighter-rouge">http(s)://&lt;user&gt;.github.io/&lt;repository&gt;</code>。</li>
+</ol>
+
+<p>我的后续文档以 <code class="highlighter-rouge">1. 用户和组织</code> 的搭建为准。</p>
+
+<h2 id="什么是-travis-ci">什么是 Travis Ci</h2>
+
+<p>简单点理解 Travis Ci 就是一个自动化操作平台（实际上功能非常强大），你只需要知道她能帮你执行所有操作，你只需要写文章就好，其他的都交给 Travis Ci 来做吧。</p>
+
+<h2 id="为什么使用-travis-ci-进行构建">为什么使用 Travis Ci 进行构建</h2>
+
+<p>因为 github 虽然提供了 Jekyll 服务，但却不支持自定义插件，如果需要使用一些自定义插件来生成页面，就只能自动动手。</p>
+
+<p>比如在使用 ci 之前，你需要在 windows 上先完成 Jekyll 安装，具体安装过程就不介绍了，有兴趣的去参考官方英文文档，不要问我为什么不推荐看中文文档，因为环境太老了，TM 最新的包都不支持，你就算按照中文文档里的教程装了，也得升级 Ruby 环境。这里推荐使用 windows linux 子系统进行安装。</p>
+
+<p>安装完环境之后，使用一段 <code class="highlighter-rouge">fuck</code> 命令去完成构建，在构建后的静态文件推送到 github 上，整个过程非常繁琐，并且还必须依赖电脑来完成。</p>
+
+<p>那如果将整个过程自动化呢，你只需要在 _posts 文件夹里编写文章，让 Travis Ci 去帮你完成那些繁琐操作呢？</p>
+
+<h2 id="搭建">搭建</h2>
+
+<p>搭建一个 Github Pages 平台需要具备如下条件：</p>
+
+<ol>
+  <li>拥有一个 Github 账号，没有的去这里 <a href="https://github.com/">https://github.com/</a> 注册一个。</li>
+  <li>拥有一个 TravisCi 账号，没有的在首次访问 travis-ci 时，使用 github 账号登录一下即可。</li>
+</ol>
+
+<hr />
+
+<p>参考的文章：</p>
+
+<ul>
+  <li>[]</li>
+  <li><a href="https://jekyllrb.com/docs/continuous-integration/travis-ci/">https://jekyllrb.com/docs/continuous-integration/travis-ci/</a></li>
+  <li><a href="https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4">https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4</a></li>
+</ul>
+
+
+    </main><footer>
+    COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+</footer>
+</div>
+  </body>
+</html>
