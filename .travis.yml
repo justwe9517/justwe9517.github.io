@@ -35,7 +35,7 @@ deploy:
     provider: pages:git
     token: $PAGES_TOKEN
     edge: true # opt in to dpl v2
-    target_branch: gh-pages
+    target_branch: master
     local_dir: './_site'
     on:
-        branch: master
+        branch: write
