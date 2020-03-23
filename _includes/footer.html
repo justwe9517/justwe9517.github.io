@@ -1,8 +1,6 @@
 <footer>
-    <span style="display: flex; flex: 1;">
-        <img src="https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write"/>
-    </span>
-    <img style="margin-right: 12px;" src="https://web.umeng.com/static/img/main/icon.gif"/>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
     COPYRIGHT © 2020. ALL RIGHTS RESERVED.
     <script>
         window.onload = function () {
@@ -10,7 +8,14 @@
             script.setAttribute('type', "text/javascript");
             script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
             script.style.opacity = 0;
-            document.getElementsByName("body")[0].appendChild(script);
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
         };
     </script>
 </footer>
