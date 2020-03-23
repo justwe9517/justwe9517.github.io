@@ -1,1 +1,3 @@
-# trojanbox.github.io
+# blog
+
+bundle exec jekyll serve
