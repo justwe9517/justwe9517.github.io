@@ -18,6 +18,44 @@ body {
   text-align: left;
   line-height: 1.7 !important; }
 
+/*滚动条整体样式*/
+body::-webkit-scrollbar {
+  width: 0; }
+
+/*滚动条滑块*/
+body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #535353; }
+
+/*滚动条轨道*/
+body::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0);
+  border-radius: 10px;
+  background: #ccc; }
+
+.main {
+  display: flex;
+  flex: 1;
+  width: 800px;
+  margin: 0 auto;
+  flex-direction: column; }
+
+blockquote {
+  border-left: 3px solid black;
+  background: #212121;
+  padding: 1px 12px;
+  margin: 12px 0; }
+  blockquote p {
+    margin: 6px 0; }
+
+hr {
+  border-bottom: 1px solid #333333;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  margin: 12px 0; }
+
 h1,
 h2,
 h3,
@@ -25,15 +63,36 @@ h4,
 h5,
 h6 {
   font-size: 16px;
-  margin: 0px;
-  margin-top: 22px;
+  margin: 12px 0;
   font-weight: bold;
   color: #000; }
+
+h1 {
+  font-size: 24px;
+  border-bottom: 1px solid #333333;
+  padding-bottom: 12px; }
+
+h2 {
+  font-size: 20px;
+  border-bottom: 1px solid #333333;
+  padding-bottom: 12px; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 16px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  font-size: 14px;
+  font-weight: normal; }
 
 p,
 ul,
 ol {
-  margin: 0px;
   color: #000;
   margin: 12px 0; }
 
@@ -62,38 +121,39 @@ h6:before { content: "######";  margin-right: 9px; }*/
  */
 .container {
   width: auto;
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 10px 10px 10px; }
+  padding: 12px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column; }
 
 p {
   word-wrap: break-word;
   word-break: break-word;
   white-space: pre-wrap;
-  text-align: justify;
-  text-indent: 32px; }
+  text-align: justify; }
 
 footer {
   color: #000;
   border-top: dashed 1px black;
-  padding-top: 10px;
+  padding-top: 12px;
   text-align: right;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border-top: 1px solid #DBDBDB;
-  font-size: 12px; }
+  margin-top: 12px;
+  border-top: 1px solid #333333;
+  font-size: 12px;
+  display: flex;
+  height: 20px;
+  align-items: center; }
 
 header {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #000; }
+  margin-bottom: 12px;
+  border-bottom: 1px solid #333333; }
 
 header p {
   text-align: left;
   margin: 0; }
-
-footer {
-  margin-bottom: 20px; }
 
 /**
  * Highlight/Markup
@@ -126,9 +186,11 @@ footer {
 .menu {
   border-top: dashed 1px black;
   border-bottom: dashed 1px black;
-  margin-bottom: 10px; }
+  display: flex;
+  flex-direction: row; }
 
 .menu ul {
+  margin-top: 0;
   padding-left: 0px;
   list-style-type: none;
   text-align: left;
@@ -136,7 +198,10 @@ footer {
 
 .menu ul li {
   display: inline;
-  margin-right: 10px; }
+  margin-right: 12px; }
+
+.menu ul li:last-child {
+  margin-right: 0; }
 
 .menu ul li a {
   text-decoration: none;
@@ -469,8 +534,14 @@ pre {
 
 /* Literal.Number.Integer.Long */
 .paginator {
-  padding-top: 10px;
-  border-top: 1px solid #DBDBDB; }
+  padding-top: 12px;
+  border-top: 1px solid #333333; }
   .paginator a {
     display: inline-block;
     padding: 0 6px; }
+
+.highlighter-rouge {
+  background: #101010;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid black; }

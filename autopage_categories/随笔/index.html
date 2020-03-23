@@ -3,13 +3,13 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>夏虫的博客分类 随笔</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+  <title>分类 随笔</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 <body>
-    <div class="container">
-
-    <main>
-      <header>
+    <div class="container"><header>
     <div class="menu">
+        <ul style="display: flex; flex: 1;">
+            <li><a href="/">夏虫的博客</a></li>
+        </ul>
         <ul>
             <li><a href="/">最新</a></li>
             <li><a href="/categories.html">分类</a></li>
@@ -17,7 +17,8 @@
             <li><a href="/collections.html">专题</a></li>
         </ul>
     </div>
-</header><ul>
+</header><main class="main">
+        <ul>
     
         <li>[ 2020-03-22 ] <a href="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</a>
         </li>
@@ -27,7 +28,25 @@
 
 
     </main><footer>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
     COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+    <script>
+        window.onload = function () {
+            var script = document.createElement('script');
+            script.setAttribute('type', "text/javascript");
+            script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
+            script.style.opacity = 0;
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
+        };
+    </script>
 </footer>
 </div>
   </body>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-03-23T11:55:26+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link href="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html" rel="alternate" type="text/html" title="使用 Travis Ci + Jekyll + Github Pages 搭建个人博客" /><published>2020-03-22T15:24:00+00:00</published><updated>2020-03-22T15:24:00+00:00</updated><id>/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages</id><content type="html" xml:base="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html">&lt;h1 id=&quot;使用-travis-ci--jekyll--github-pages-搭建个人博客&quot;&gt;使用 Travis Ci + Jekyll + Github Pages 搭建个人博客&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-03-23T15:32:26+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link href="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html" rel="alternate" type="text/html" title="使用 Travis Ci + Jekyll + Github Pages 搭建个人博客" /><published>2020-03-22T15:24:00+00:00</published><updated>2020-03-22T15:24:00+00:00</updated><id>/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages</id><content type="html" xml:base="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html">&lt;h1 id=&quot;使用-travis-ci--jekyll--github-pages-搭建个人博客&quot;&gt;使用 Travis Ci + Jekyll + Github Pages 搭建个人博客&lt;/h1&gt;
 
 &lt;p&gt;一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。&lt;/p&gt;
 
@@ -29,10 +29,10 @@
 
 &lt;p&gt;构建过程运行文件就是 github 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 格式内容并交给 Jekyll 来解析，自动生成静态文件。&lt;/p&gt;
 
-&lt;p&gt;同时，网上的很多文章并没有介绍清除，其实 Github Pages 提供了三种类型的仓库项目、用户和组织（因为太懒，没有直接读官方的中文文档，导致踩了不少坑）：&lt;/p&gt;
+&lt;p&gt;Github Pages 提供了三种类型的仓库项目、用户和组织：&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;user&amp;gt;.github.io&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;organization&amp;gt;.github.io&lt;/code&gt; 的项目。你就可以直接通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;username&amp;gt;.github.io&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;organization&amp;gt;.github.io&lt;/code&gt;。
+  &lt;li&gt;用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;user&amp;gt;.github.io&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;organization&amp;gt;.github.io&lt;/code&gt; 的项目。你就可以直接通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;username&amp;gt;.github.io&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;organization&amp;gt;.github.io&lt;/code&gt; 来访问，比如我的博客便是采用这种方式。
 需要注意：这种类型的项目，只能使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; 分支发布。&lt;/li&gt;
   &lt;li&gt;项目站点：项目站点的源文件与其项目存储在同一个仓库中的，这种一般使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; 分支发布，访问方式为 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;user&amp;gt;.github.io/&amp;lt;repository&amp;gt;&lt;/code&gt;。&lt;/li&gt;
 &lt;/ol&gt;
@@ -45,13 +45,27 @@
 
 &lt;h2 id=&quot;为什么使用-travis-ci-进行构建&quot;&gt;为什么使用 Travis Ci 进行构建&lt;/h2&gt;
 
-&lt;p&gt;因为 github 虽然提供了 Jekyll 服务，但却不支持自定义插件，如果需要使用一些自定义插件来生成页面，就只能自动动手。&lt;/p&gt;
+&lt;p&gt;虽然 Github Pages 内置了 Jekyll 服务，但却不支持使用自定义插件，这就限制了 Github Pages 的使用场景。&lt;/p&gt;
 
-&lt;p&gt;比如在使用 ci 之前，你需要在 windows 上先完成 Jekyll 安装，具体安装过程就不介绍了，有兴趣的去参考官方英文文档，不要问我为什么不推荐看中文文档，因为环境太老了，TM 最新的包都不支持，你就算按照中文文档里的教程装了，也得升级 Ruby 环境。这里推荐使用 windows linux 子系统进行安装。&lt;/p&gt;
+&lt;p&gt;现在咱们来看看，如果不使用 Github Pages 内置的 Jekyll 服务构建，通过手动的方式发布文章，需要进行哪几步骤操作：&lt;/p&gt;
 
-&lt;p&gt;安装完环境之后，使用一段 &lt;code class=&quot;highlighter-rouge&quot;&gt;fuck&lt;/code&gt; 命令去完成构建，在构建后的静态文件推送到 github 上，整个过程非常繁琐，并且还必须依赖电脑来完成。&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;安装 Ruby 环境。&lt;/li&gt;
+  &lt;li&gt;安装 Git 服务。&lt;/li&gt;
+  &lt;li&gt;安装 Jekyll 服务。&lt;/li&gt;
+  &lt;li&gt;克隆项目。&lt;/li&gt;
+  &lt;li&gt;在 _post 目录中编辑文章。&lt;/li&gt;
+  &lt;li&gt;通过命令生成 _site 目录。&lt;/li&gt;
+  &lt;li&gt;使用 git 推送更改。&lt;/li&gt;
+&lt;/ol&gt;
 
-&lt;p&gt;那如果将整个过程自动化呢，你只需要在 _posts 文件夹里编写文章，让 Travis Ci 去帮你完成那些繁琐操作呢？&lt;/p&gt;
+&lt;p&gt;再来看看，如果使用 Travis-Ci 发布文章需要哪几个步骤：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;安装 Git 服务，克隆项目，在 _post 目录中编辑文章，使用 git 推送更改。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;好了，经过我上面的简单介绍，我想大家也都清楚 Travis-Ci 是个多么强大的生产力工具。你甚至可以直接在 github.com 网站上直接编写文章。&lt;/p&gt;
 
 &lt;h2 id=&quot;搭建&quot;&gt;搭建&lt;/h2&gt;
 
@@ -59,7 +73,7 @@
 
 &lt;ol&gt;
   &lt;li&gt;拥有一个 Github 账号，没有的去这里 &lt;a href=&quot;https://github.com/&quot;&gt;https://github.com/&lt;/a&gt; 注册一个。&lt;/li&gt;
-  &lt;li&gt;拥有一个 TravisCi 账号，没有的在首次访问 travis-ci 时，使用 github 账号登录一下即可。&lt;/li&gt;
+  &lt;li&gt;拥有一个 TravisCi 账号，首次访问 travis-ci 时直接使用 github 账号登录一下即可。&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&quot;创建仓库&quot;&gt;创建仓库&lt;/h3&gt;
@@ -68,10 +82,15 @@
 
 &lt;p&gt;&lt;img src=&quot;/assets/uploads/c432a25a298f467960517f517ff72c9.png&quot; alt=&quot;c432a25a298f467960517f517ff72c9&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;进入 Create a new repository 页面后按照图中的要求填写：&lt;/p&gt;
+&lt;p&gt;进入 &lt;code class=&quot;highlighter-rouge&quot;&gt;Create a new repository&lt;/code&gt; 页面后按照图中的要求操作：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/uploads/08a4a7ce65eb13958c7f2e4e10a64cd.png&quot; alt=&quot;08a4a7ce65eb13958c7f2e4e10a64cd&quot; /&gt;&lt;/p&gt;
 
+&lt;p&gt;点击 &lt;code class=&quot;highlighter-rouge&quot;&gt;Create repository&lt;/code&gt; 按钮即可完成项目创建。&lt;/p&gt;
+
+&lt;p&gt;项目创建完成之后，你需要先添加一些内容进去，为了方便期间&lt;/p&gt;
+
+&lt;h3 id=&quot;登录-travisci-平台&quot;&gt;登录 TravisCi 平台&lt;/h3&gt;
 &lt;hr /&gt;
 
 &lt;p&gt;参考的文章：&lt;/p&gt;

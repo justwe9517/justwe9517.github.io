@@ -3,13 +3,13 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>夏虫的博客使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+  <title>使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 <body>
-    <div class="container">
-
-    <main>
-      <header>
+    <div class="container"><header>
     <div class="menu">
+        <ul style="display: flex; flex: 1;">
+            <li><a href="/">夏虫的博客</a></li>
+        </ul>
         <ul>
             <li><a href="/">最新</a></li>
             <li><a href="/categories.html">分类</a></li>
@@ -17,7 +17,14 @@
             <li><a href="/collections.html">专题</a></li>
         </ul>
     </div>
-</header><h1 id="使用-travis-ci--jekyll--github-pages-搭建个人博客">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</h1>
+</header><main class="main">
+        <style>
+    header {
+        margin-bottom: 0 !important;
+    }
+</style>
+
+<h1 id="使用-travis-ci--jekyll--github-pages-搭建个人博客">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</h1>
 
 <p>一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。</p>
 
@@ -48,10 +55,10 @@
 
 <p>构建过程运行文件就是 github 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 格式内容并交给 Jekyll 来解析，自动生成静态文件。</p>
 
-<p>同时，网上的很多文章并没有介绍清除，其实 Github Pages 提供了三种类型的仓库项目、用户和组织（因为太懒，没有直接读官方的中文文档，导致踩了不少坑）：</p>
+<p>Github Pages 提供了三种类型的仓库项目、用户和组织：</p>
 
 <ol>
-  <li>用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 <code class="highlighter-rouge">&lt;user&gt;.github.io</code> 或 <code class="highlighter-rouge">&lt;organization&gt;.github.io</code> 的项目。你就可以直接通过 <code class="highlighter-rouge">http(s)://&lt;username&gt;.github.io</code> 或 <code class="highlighter-rouge">http(s)://&lt;organization&gt;.github.io</code>。
+  <li>用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 <code class="highlighter-rouge">&lt;user&gt;.github.io</code> 或 <code class="highlighter-rouge">&lt;organization&gt;.github.io</code> 的项目。你就可以直接通过 <code class="highlighter-rouge">http(s)://&lt;username&gt;.github.io</code> 或 <code class="highlighter-rouge">http(s)://&lt;organization&gt;.github.io</code> 来访问，比如我的博客便是采用这种方式。
 需要注意：这种类型的项目，只能使用 <code class="highlighter-rouge">master</code> 分支发布。</li>
   <li>项目站点：项目站点的源文件与其项目存储在同一个仓库中的，这种一般使用 <code class="highlighter-rouge">gh-pages</code> 分支发布，访问方式为 <code class="highlighter-rouge">http(s)://&lt;user&gt;.github.io/&lt;repository&gt;</code>。</li>
 </ol>
@@ -64,13 +71,27 @@
 
 <h2 id="为什么使用-travis-ci-进行构建">为什么使用 Travis Ci 进行构建</h2>
 
-<p>因为 github 虽然提供了 Jekyll 服务，但却不支持自定义插件，如果需要使用一些自定义插件来生成页面，就只能自动动手。</p>
+<p>虽然 Github Pages 内置了 Jekyll 服务，但却不支持使用自定义插件，这就限制了 Github Pages 的使用场景。</p>
 
-<p>比如在使用 ci 之前，你需要在 windows 上先完成 Jekyll 安装，具体安装过程就不介绍了，有兴趣的去参考官方英文文档，不要问我为什么不推荐看中文文档，因为环境太老了，TM 最新的包都不支持，你就算按照中文文档里的教程装了，也得升级 Ruby 环境。这里推荐使用 windows linux 子系统进行安装。</p>
+<p>现在咱们来看看，如果不使用 Github Pages 内置的 Jekyll 服务构建，通过手动的方式发布文章，需要进行哪几步骤操作：</p>
 
-<p>安装完环境之后，使用一段 <code class="highlighter-rouge">fuck</code> 命令去完成构建，在构建后的静态文件推送到 github 上，整个过程非常繁琐，并且还必须依赖电脑来完成。</p>
+<ol>
+  <li>安装 Ruby 环境。</li>
+  <li>安装 Git 服务。</li>
+  <li>安装 Jekyll 服务。</li>
+  <li>克隆项目。</li>
+  <li>在 _post 目录中编辑文章。</li>
+  <li>通过命令生成 _site 目录。</li>
+  <li>使用 git 推送更改。</li>
+</ol>
 
-<p>那如果将整个过程自动化呢，你只需要在 _posts 文件夹里编写文章，让 Travis Ci 去帮你完成那些繁琐操作呢？</p>
+<p>再来看看，如果使用 Travis-Ci 发布文章需要哪几个步骤：</p>
+
+<ol>
+  <li>安装 Git 服务，克隆项目，在 _post 目录中编辑文章，使用 git 推送更改。</li>
+</ol>
+
+<p>好了，经过我上面的简单介绍，我想大家也都清楚 Travis-Ci 是个多么强大的生产力工具。你甚至可以直接在 github.com 网站上直接编写文章。</p>
 
 <h2 id="搭建">搭建</h2>
 
@@ -78,7 +99,7 @@
 
 <ol>
   <li>拥有一个 Github 账号，没有的去这里 <a href="https://github.com/">https://github.com/</a> 注册一个。</li>
-  <li>拥有一个 TravisCi 账号，没有的在首次访问 travis-ci 时，使用 github 账号登录一下即可。</li>
+  <li>拥有一个 TravisCi 账号，首次访问 travis-ci 时直接使用 github 账号登录一下即可。</li>
 </ol>
 
 <h3 id="创建仓库">创建仓库</h3>
@@ -87,10 +108,15 @@
 
 <p><img src="/assets/uploads/c432a25a298f467960517f517ff72c9.png" alt="c432a25a298f467960517f517ff72c9" /></p>
 
-<p>进入 Create a new repository 页面后按照图中的要求填写：</p>
+<p>进入 <code class="highlighter-rouge">Create a new repository</code> 页面后按照图中的要求操作：</p>
 
 <p><img src="/assets/uploads/08a4a7ce65eb13958c7f2e4e10a64cd.png" alt="08a4a7ce65eb13958c7f2e4e10a64cd" /></p>
 
+<p>点击 <code class="highlighter-rouge">Create repository</code> 按钮即可完成项目创建。</p>
+
+<p>项目创建完成之后，你需要先添加一些内容进去，为了方便期间</p>
+
+<h3 id="登录-travisci-平台">登录 TravisCi 平台</h3>
 <hr />
 
 <p>参考的文章：</p>
@@ -103,7 +129,25 @@
 
 
     </main><footer>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
     COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+    <script>
+        window.onload = function () {
+            var script = document.createElement('script');
+            script.setAttribute('type', "text/javascript");
+            script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
+            script.style.opacity = 0;
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
+        };
+    </script>
 </footer>
 </div>
   </body>
