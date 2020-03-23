@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-03-23T11:37:03+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link href="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html" rel="alternate" type="text/html" title="使用 Travis Ci + Jekyll + Github Pages 搭建个人博客" /><published>2020-03-22T15:24:00+00:00</published><updated>2020-03-22T15:24:00+00:00</updated><id>/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages</id><content type="html" xml:base="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html">&lt;h1 id=&quot;使用-travis-ci--jekyll--github-pages-搭建个人博客&quot;&gt;使用 Travis Ci + Jekyll + Github Pages 搭建个人博客&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-03-23T11:55:26+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link href="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html" rel="alternate" type="text/html" title="使用 Travis Ci + Jekyll + Github Pages 搭建个人博客" /><published>2020-03-22T15:24:00+00:00</published><updated>2020-03-22T15:24:00+00:00</updated><id>/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages</id><content type="html" xml:base="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html">&lt;h1 id=&quot;使用-travis-ci--jekyll--github-pages-搭建个人博客&quot;&gt;使用 Travis Ci + Jekyll + Github Pages 搭建个人博客&lt;/h1&gt;
 
 &lt;p&gt;一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。&lt;/p&gt;
 
@@ -61,6 +61,16 @@
   &lt;li&gt;拥有一个 Github 账号，没有的去这里 &lt;a href=&quot;https://github.com/&quot;&gt;https://github.com/&lt;/a&gt; 注册一个。&lt;/li&gt;
   &lt;li&gt;拥有一个 TravisCi 账号，没有的在首次访问 travis-ci 时，使用 github 账号登录一下即可。&lt;/li&gt;
 &lt;/ol&gt;
+
+&lt;h3 id=&quot;创建仓库&quot;&gt;创建仓库&lt;/h3&gt;
+
+&lt;p&gt;首先进入 github 点击右上角的加号，如下图所示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/uploads/c432a25a298f467960517f517ff72c9.png&quot; alt=&quot;c432a25a298f467960517f517ff72c9&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;进入 Create a new repository 页面后按照图中的要求填写：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/uploads/08a4a7ce65eb13958c7f2e4e10a64cd.png&quot; alt=&quot;08a4a7ce65eb13958c7f2e4e10a64cd&quot; /&gt;&lt;/p&gt;
 
 &lt;hr /&gt;
 
