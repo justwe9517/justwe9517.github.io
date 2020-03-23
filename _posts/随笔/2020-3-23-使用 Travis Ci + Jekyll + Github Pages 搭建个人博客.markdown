@@ -1,0 +1,73 @@
+---
+layout: post
+title:  "使用 Travis Ci + Jekyll + Github Pages 搭建个人博客"
+date: 2020-03-23 15:24
+categories: 随笔
+tags: ['随笔']
+collection: 随笔
+---
+
+# 使用 Travis Ci + Jekyll + Github Pages 搭建个人博客
+
+一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。
+
+Github Pages 的整个搭建过程其实并不复杂，但无奈网上的文章坑太多，让我在搭建的过程中走了不少弯路，于是计划新写一篇文章来好好的总结一下整个搭建过程。
+
+
+太长不看版：
+
+> 直接 fork 我这个项目 [https://github.com/trojanbox/trojanbox.github.io.travis](https://github.com/trojanbox/trojanbox.github.io.travis)。write 为文章分支，pages 使用 master 分支发布。
+
+----- 
+
+好了不扯皮，现在进入正题：
+
+1. 什么是 Github Pages
+2. 什么是 Travis Ci
+3. 为什么使用 Travis Ci 进行构建
+4. 搭建
+
+## 什么是 Github Pages
+
+> GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。
+
+构建过程运行文件就是 github 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 格式内容并交给 Jekyll 来解析，自动生成静态文件。
+
+同时，网上的很多文章并没有介绍清除，其实 Github Pages 提供了三种类型的仓库项目、用户和组织（因为太懒，没有直接读官方的中文文档，导致踩了不少坑）：
+
+1. 用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 `<user>.github.io` 或 `<organization>.github.io` 的项目。你就可以直接通过 `http(s)://<username>.github.io` 或 `http(s)://<organization>.github.io`。
+   需要注意：这种类型的项目，只能使用 `master` 分支发布。
+2. 项目站点：项目站点的源文件与其项目存储在同一个仓库中的，这种一般使用 `gh-pages` 分支发布，访问方式为 `http(s)://<user>.github.io/<repository>`。
+
+我的后续文档以 `1. 用户和组织` 的搭建为准。
+
+## 什么是 Travis Ci
+
+简单点理解 Travis Ci 就是一个自动化操作平台（实际上功能非常强大），你只需要知道她能帮你执行所有操作，你只需要写文章就好，其他的都交给 Travis Ci 来做吧。
+
+## 为什么使用 Travis Ci 进行构建
+
+因为 github 虽然提供了 Jekyll 服务，但却不支持自定义插件，如果需要使用一些自定义插件来生成页面，就只能自动动手。
+
+比如在使用 ci 之前，你需要在 windows 上先完成 Jekyll 安装，具体安装过程就不介绍了，有兴趣的去参考官方英文文档，不要问我为什么不推荐看中文文档，因为环境太老了，TM 最新的包都不支持，你就算按照中文文档里的教程装了，也得升级 Ruby 环境。这里推荐使用 windows linux 子系统进行安装。
+
+安装完环境之后，使用一段 `fuck` 命令去完成构建，在构建后的静态文件推送到 github 上，整个过程非常繁琐，并且还必须依赖电脑来完成。
+
+那如果将整个过程自动化呢，你只需要在 _posts 文件夹里编写文章，让 Travis Ci 去帮你完成那些繁琐操作呢？
+
+## 搭建
+
+搭建一个 Github Pages 平台需要具备如下条件：
+
+1. 拥有一个 Github 账号，没有的去这里 [https://github.com/](https://github.com/) 注册一个。
+2. 拥有一个 TravisCi 账号，没有的在首次访问 travis-ci 时，使用 github 账号登录一下即可。
+
+
+
+----- 
+
+参考的文章：
+
+- []
+- [https://jekyllrb.com/docs/continuous-integration/travis-ci/](https://jekyllrb.com/docs/continuous-integration/travis-ci/)
+- [https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4](https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4)
