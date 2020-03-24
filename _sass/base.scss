@@ -326,13 +326,13 @@ textarea {
  * Code and syntax highlighting
  */
 pre {
-    background-color: $background-color;
     border: none;
     padding: 0px;
     overflow: auto;
     font-size: $base-font-size;
     color: rgba(255, 255, 255, 0.65);
     line-height: 1.7 !important;
+    margin: 0;
 }
 
 .highlight .c {
