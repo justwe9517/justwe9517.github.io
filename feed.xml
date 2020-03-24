@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-03-23T15:32:26+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link href="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html" rel="alternate" type="text/html" title="使用 Travis Ci + Jekyll + Github Pages 搭建个人博客" /><published>2020-03-22T15:24:00+00:00</published><updated>2020-03-22T15:24:00+00:00</updated><id>/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages</id><content type="html" xml:base="/%E9%9A%8F%E7%AC%94/2020/03/22/2020-3-23-create.github.pages.html">&lt;h1 id=&quot;使用-travis-ci--jekyll--github-pages-搭建个人博客&quot;&gt;使用 Travis Ci + Jekyll + Github Pages 搭建个人博客&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-03-24T15:46:41+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link href="/jekyll/2020/03/22/%E4%BD%BF%E7%94%A8-Travis-Ci-+-Jekyll-+-Github-Pages-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2.html" rel="alternate" type="text/html" title="使用 Travis Ci + Jekyll + Github Pages 搭建个人博客" /><published>2020-03-22T15:24:00+00:00</published><updated>2020-03-22T15:24:00+00:00</updated><id>/jekyll/2020/03/22/%E4%BD%BF%E7%94%A8%20Travis%20Ci%20+%20Jekyll%20+%20Github%20Pages%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2</id><content type="html" xml:base="/jekyll/2020/03/22/%E4%BD%BF%E7%94%A8-Travis-Ci-+-Jekyll-+-Github-Pages-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2.html">&lt;h1 id=&quot;使用-travis-ci--jekyll--github-pages-搭建个人博客&quot;&gt;使用 Travis Ci + Jekyll + Github Pages 搭建个人博客&lt;/h1&gt;
 
 &lt;p&gt;一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。&lt;/p&gt;
 
@@ -7,19 +7,10 @@
 &lt;p&gt;太长不看版：&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;直接 fork 我这个项目 &lt;a href=&quot;https://github.com/trojanbox/trojanbox.github.io.travis&quot;&gt;https://github.com/trojanbox/trojanbox.github.io.travis&lt;/a&gt;。write 为文章分支，pages 使用 master 分支发布。&lt;/p&gt;
+  &lt;p&gt;直接 fork 我这个&lt;a href=&quot;https://github.com/justwe9517/justwe9517.github.io&quot;&gt;博客项目&lt;/a&gt;，然后参考&lt;code class=&quot;highlighter-rouge&quot;&gt;集成 Travis CI 平台&lt;/code&gt;那一节完成 Travis CI 的配置，之后直接在 write 分支中写文章即可。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;hr /&gt;
-
-&lt;p&gt;好了不扯皮，现在进入正题：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;什么是 Github Pages&lt;/li&gt;
-  &lt;li&gt;什么是 Travis Ci&lt;/li&gt;
-  &lt;li&gt;为什么使用 Travis Ci 进行构建&lt;/li&gt;
-  &lt;li&gt;搭建&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;下面进入正文：&lt;/p&gt;
 
 &lt;h2 id=&quot;什么是-github-pages&quot;&gt;什么是 Github Pages&lt;/h2&gt;
 
@@ -27,21 +18,19 @@
   &lt;p&gt;GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;构建过程运行文件就是 github 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 格式内容并交给 Jekyll 来解析，自动生成静态文件。&lt;/p&gt;
+&lt;p&gt;构建过程运行文件就是 Github Pages 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 文本并交给 Jekyll 来解析，自动生成静态文件。&lt;/p&gt;
 
-&lt;p&gt;Github Pages 提供了三种类型的仓库项目、用户和组织：&lt;/p&gt;
+&lt;p&gt;Github Pages 提供了三种类型的仓库，分别为项目、用户和组织。&lt;/p&gt;
 
-&lt;ol&gt;
-  &lt;li&gt;用户和组织：只要你创建一个与自己的登录名或组织名开头，格式为 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;user&amp;gt;.github.io&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;organization&amp;gt;.github.io&lt;/code&gt; 的项目。你就可以直接通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;username&amp;gt;.github.io&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;organization&amp;gt;.github.io&lt;/code&gt; 来访问，比如我的博客便是采用这种方式。
-需要注意：这种类型的项目，只能使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; 分支发布。&lt;/li&gt;
-  &lt;li&gt;项目站点：项目站点的源文件与其项目存储在同一个仓库中的，这种一般使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; 分支发布，访问方式为 &lt;code class=&quot;highlighter-rouge&quot;&gt;http(s)://&amp;lt;user&amp;gt;.github.io/&amp;lt;repository&amp;gt;&lt;/code&gt;。&lt;/li&gt;
-&lt;/ol&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;你可在此文档中查看 Github Pages 支持的具体类型：&lt;a href=&quot;https://help.github.com/cn/github/working-with-github-pages/about-github-pages#&quot;&gt;https://help.github.com/cn/github/working-with-github-pages/about-github-pages#&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
 
-&lt;p&gt;我的后续文档以 &lt;code class=&quot;highlighter-rouge&quot;&gt;1. 用户和组织&lt;/code&gt; 的搭建为准。&lt;/p&gt;
+&lt;p&gt;后续文档我会以 &lt;code class=&quot;highlighter-rouge&quot;&gt;用户&lt;/code&gt; 类型站点为模板进行讲解。&lt;/p&gt;
 
-&lt;h2 id=&quot;什么是-travis-ci&quot;&gt;什么是 Travis Ci&lt;/h2&gt;
+&lt;h2 id=&quot;什么是-travis-ci&quot;&gt;什么是 Travis CI&lt;/h2&gt;
 
-&lt;p&gt;简单点理解 Travis Ci 就是一个自动化操作平台（实际上功能非常强大），你只需要知道她能帮你执行所有操作，你只需要写文章就好，其他的都交给 Travis Ci 来做吧。&lt;/p&gt;
+&lt;p&gt;简单点理解 Travis Ci 就是一个自动化操作平台（实际上功能非常强大），你只需要知道它能代替你执行所有操作，你只需要关注如何写好文章，其他的事情都交给 Travis CI 来就好了。&lt;/p&gt;
 
 &lt;h2 id=&quot;为什么使用-travis-ci-进行构建&quot;&gt;为什么使用 Travis Ci 进行构建&lt;/h2&gt;
 
@@ -67,18 +56,21 @@
 
 &lt;p&gt;好了，经过我上面的简单介绍，我想大家也都清楚 Travis-Ci 是个多么强大的生产力工具。你甚至可以直接在 github.com 网站上直接编写文章。&lt;/p&gt;
 
-&lt;h2 id=&quot;搭建&quot;&gt;搭建&lt;/h2&gt;
+&lt;h2 id=&quot;搭建环境&quot;&gt;搭建环境&lt;/h2&gt;
 
 &lt;p&gt;搭建一个 Github Pages 平台需要具备如下条件：&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;拥有一个 Github 账号，没有的去这里 &lt;a href=&quot;https://github.com/&quot;&gt;https://github.com/&lt;/a&gt; 注册一个。&lt;/li&gt;
-  &lt;li&gt;拥有一个 TravisCi 账号，首次访问 travis-ci 时直接使用 github 账号登录一下即可。&lt;/li&gt;
+  &lt;li&gt;会熟练使用 Git 命令，不会的需要在 &lt;a href=&quot;https://git-scm.com/book/zh/v2&quot;&gt;https://git-scm.com/book/zh/v2&lt;/a&gt; 简单学习一下。&lt;/li&gt;
+  &lt;li&gt;知道如何创建 Jekyll 项目，不会的需要在 &lt;a href=&quot;https://jekyllrb.com/docs/installation/&quot;&gt;https://jekyllrb.com/docs/installation/&lt;/a&gt; 学习一下如何创建项目。&lt;/li&gt;
 &lt;/ol&gt;
+
+&lt;p&gt;在继续浏览后续文章之前，请务掌握上面三点，因为我不会在介绍如何使用 git 命令，以及如何在不同平台下创建 Jekyll 项目了。不过，你可以直接 fork 我的项目，这样你就不需要在掌握第三条了 :-)。&lt;/p&gt;
 
 &lt;h3 id=&quot;创建仓库&quot;&gt;创建仓库&lt;/h3&gt;
 
-&lt;p&gt;首先进入 github 点击右上角的加号，如下图所示：&lt;/p&gt;
+&lt;p&gt;首先进入 Github 点击右上角的加号，如下图所示：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/uploads/c432a25a298f467960517f517ff72c9.png&quot; alt=&quot;c432a25a298f467960517f517ff72c9&quot; /&gt;&lt;/p&gt;
 
@@ -88,15 +80,161 @@
 
 &lt;p&gt;点击 &lt;code class=&quot;highlighter-rouge&quot;&gt;Create repository&lt;/code&gt; 按钮即可完成项目创建。&lt;/p&gt;
 
-&lt;p&gt;项目创建完成之后，你需要先添加一些内容进去，为了方便期间&lt;/p&gt;
+&lt;p&gt;项目创建完成之后先来对项目进行一下简单的配置，首选你需要先创建一个 write 分支，并将其设置为默认分支，操作步骤如下：&lt;/p&gt;
 
-&lt;h3 id=&quot;登录-travisci-平台&quot;&gt;登录 TravisCi 平台&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;在项目的 Code 选项卡中，找到左下角的 &lt;code class=&quot;highlighter-rouge&quot;&gt;Branch: master&lt;/code&gt; 下拉框：
+ &lt;img src=&quot;/assets/uploads/e1575eca8e5984ae29b721b4c60db24.png&quot; alt=&quot;e1575eca8e5984ae29b721b4c60db24&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;点击下拉框并在输入框内输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;write&lt;/code&gt; 名称，如果 &lt;code class=&quot;highlighter-rouge&quot;&gt;write&lt;/code&gt; 分支不存在，下方的文字应该为 &lt;code class=&quot;highlighter-rouge&quot;&gt;Create branch: write from 'master'&lt;/code&gt;，点击它创建分支，创建成功后上图的 &lt;code class=&quot;highlighter-rouge&quot;&gt;1 branch&lt;/code&gt; 会变成 &lt;code class=&quot;highlighter-rouge&quot;&gt;2 branch&lt;/code&gt;。
+ &lt;img src=&quot;/assets/uploads/48f12cf7589d4548e783f5201dbed62.png&quot; alt=&quot;48f12cf7589d4548e783f5201dbed62&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;分支创建成功后，只需要在将其设置为默认分支即可。
+步骤：你需要在选项卡中点击 Settings 按钮进入项目设置页面，并在左侧的导航中找到 &lt;code class=&quot;highlighter-rouge&quot;&gt;Branches&lt;/code&gt; 菜单，点击菜单后，右侧页面会出现 &lt;code class=&quot;highlighter-rouge&quot;&gt;Default branch&lt;/code&gt; 文字，你在下来菜单中选中 &lt;code class=&quot;highlighter-rouge&quot;&gt;write&lt;/code&gt; 分支，并点击旁边的 &lt;code class=&quot;highlighter-rouge&quot;&gt;update&lt;/code&gt; 按钮即可。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;完成上面的三步之后，你就可以导入代码了。&lt;/p&gt;
+
+&lt;p&gt;你需要先添加一些内容进去，可以直接去 &lt;code class=&quot;highlighter-rouge&quot;&gt;https://github.com/justwe9517/justwe9517.github.io&lt;/code&gt; 下载我的模板，也可以导入其他 Jekyll 项目的模板。&lt;/p&gt;
+
+&lt;h3 id=&quot;配置项目&quot;&gt;配置项目&lt;/h3&gt;
+
+&lt;p&gt;下图是一个标准的 Jekyll 项目目录结构。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;_includes
+_layouts
+_posts
+_sass
+assets
+script
+.gitignore
+404.html
+README.md
+_config.yml
+index.md
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;我们需要在这个目录中加几个文件进去，告诉 Travis CI 如何处理这个项目。&lt;/p&gt;
+
+&lt;p&gt;如果你是使用我的网站源码，那你可以直接跳过这部分！&lt;/p&gt;
+
+&lt;p&gt;对于没使用我的站点源码的朋友，我现在仔细说说需要添加哪些文件进去。&lt;/p&gt;
+
+&lt;h4 id=&quot;gemfile-文件&quot;&gt;Gemfile 文件&lt;/h4&gt;
+
+&lt;p&gt;首先，你需要在项目的跟目录中添加名为 &lt;code class=&quot;highlighter-rouge&quot;&gt;Gemfile&lt;/code&gt; 的配置文件，并将下面的内容复制进去，此文件的作用是处理项目依赖。&lt;/p&gt;
+
+&lt;p&gt;你可以在这里找到下面代码的作用：&lt;a href=&quot;https://jekyllrb.com/docs/continuous-integration/travis-ci/&quot;&gt;Jekyll Deployment Travis CI&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;https://rubygems.org&quot;&lt;/span&gt;
+
+gem &lt;span class=&quot;s2&quot;&gt;&quot;jekyll&quot;&lt;/span&gt;, &lt;span class=&quot;s2&quot;&gt;&quot;~&amp;gt; 3.8.5&quot;&lt;/span&gt;
+gem &lt;span class=&quot;s2&quot;&gt;&quot;minima&quot;&lt;/span&gt;, &lt;span class=&quot;s2&quot;&gt;&quot;~&amp;gt; 2.0&quot;&lt;/span&gt;
+group :jekyll_plugins &lt;span class=&quot;k&quot;&gt;do
+  &lt;/span&gt;gem &lt;span class=&quot;s2&quot;&gt;&quot;jekyll-feed&quot;&lt;/span&gt;, &lt;span class=&quot;s2&quot;&gt;&quot;~&amp;gt; 0.6&quot;&lt;/span&gt;
+end
+gem &lt;span class=&quot;s2&quot;&gt;&quot;tzinfo-data&quot;&lt;/span&gt;, platforms: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;:mingw, :mswin, :x64_mingw, :jruby]
+gem &lt;span class=&quot;s2&quot;&gt;&quot;wdm&quot;&lt;/span&gt;, &lt;span class=&quot;s2&quot;&gt;&quot;~&amp;gt; 0.1.0&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Gem.win_platform?
+gem &lt;span class=&quot;s2&quot;&gt;&quot;rake&quot;&lt;/span&gt;
+gem &lt;span class=&quot;s2&quot;&gt;&quot;html-proofer&quot;&lt;/span&gt;
+gem &lt;span class=&quot;s2&quot;&gt;&quot;jekyll-theme-console&quot;&lt;/span&gt;
+gem &lt;span class=&quot;s2&quot;&gt;&quot;jekyll-paginate-v2&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 自定义插件都要写到这里&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;travisyml-文件&quot;&gt;.travis.yml 文件&lt;/h4&gt;
+
+&lt;p&gt;之后，你需要在项目的跟目录中添加名为 &lt;code class=&quot;highlighter-rouge&quot;&gt;.travis.yml&lt;/code&gt; 的配置文件，继续将下面的内容复制进去，此文件的作用是告诉 Travis CI 如何处理此项目。&lt;/p&gt;
+
+&lt;p&gt;你可以在这里找到下面代码的作用：&lt;a href=&quot;https://jekyllrb.com/docs/continuous-integration/travis-ci/&quot;&gt;Jekyll Deployment Travis CI&lt;/a&gt;，&lt;a href=&quot;https://docs.travis-ci.com/user/deployment-v2/providers/pages/&quot;&gt;Travis CI GitHub Pages Deployment&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Jekyll Deployment Travis CI 文章会告诉你如何在 Travis CI 中生成 _site 目录。&lt;/p&gt;
+
+&lt;p&gt;Travis CI GitHub Pages Deployment 文章会告诉你如何部署到 Github Pages 中。&lt;/p&gt;
+
+&lt;div class=&quot;language-yml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;language&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ruby&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;rvm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2.6.3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;before_script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;chmod +x ./script/cibuild&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;./script/cibuild&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;branches&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;only&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;write&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;master&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;global&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NOKOGIRI_USE_SYSTEM_LIBRARIES=true&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;addons&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;apt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;packages&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;libcurl4-openssl-dev&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;sudo&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bundler&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;notifications&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
+
+&lt;span class=&quot;na&quot;&gt;deploy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;provider&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pages:git&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;token&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;$PAGES_TOKEN&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# opt in to dpl v2&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;target_branch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;master&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;local_dir&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;./_site'&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;branch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;write&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;scriptcibuild-文件&quot;&gt;script/cibuild 文件&lt;/h4&gt;
+
+&lt;p&gt;还差最后一个文件，你需要在项目的跟目录中创建一个名为 &lt;code class=&quot;highlighter-rouge&quot;&gt;script&lt;/code&gt; 的目录，并在这个目录中在创建一个 &lt;code class=&quot;highlighter-rouge&quot;&gt;cibuild&lt;/code&gt; 文件，并将下面的内容复制进去，此文件是 Travis CI 的一部分。&lt;/p&gt;
+
+&lt;p&gt;你可以在这里找到下面代码的作用：&lt;a href=&quot;https://jekyllrb.com/docs/continuous-integration/travis-ci/&quot;&gt;Jekyll Deployment Travis CI&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/usr/bin/env bash&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;set&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# halt script on error&lt;/span&gt;
+
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;jekyll build
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;htmlproofer ./_site
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;完成上面几步之后，你的目录看起来应该是下面这个样子：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;_includes
+_layouts
+_posts
+_sass
+assets
+script
+.gitignore
+404.html
+README.md
+_config.yml
+index.md
+Gemfile           &lt;span class=&quot;c&quot;&gt;# 新添加的文件&lt;/span&gt;
+.travis-ci.yml    &lt;span class=&quot;c&quot;&gt;# 新添加的文件&lt;/span&gt;
+script/cibuild    &lt;span class=&quot;c&quot;&gt;# 新添加的文件&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;如果确认无误，那这个项目就配置好了，接下来只需要简单的配置一下 Travis CI，你就可以享受由 Github Pages 带来的爽快感。&lt;/p&gt;
+
+&lt;h3 id=&quot;集成-travis-ci-平台&quot;&gt;集成 Travis CI 平台&lt;/h3&gt;
+
+&lt;p&gt;在浏览器中 &lt;code class=&quot;highlighter-rouge&quot;&gt;https://travis-ci.com/&lt;/code&gt; 进入 Travis CI 网站，注意不要进入到 &lt;code class=&quot;highlighter-rouge&quot;&gt;https://travis-ci.org/&lt;/code&gt; 网站，前者是收费版，但如果是开源项目可以免费享受到构建。&lt;/p&gt;
+
+&lt;p&gt;在这个网站中你可以点击右上角的 &lt;code class=&quot;highlighter-rouge&quot;&gt;Sign in&lt;/code&gt; 按钮，使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;SIGN IN WITH GITHUB&lt;/code&gt; 进行登录。&lt;/p&gt;
+
+&lt;p&gt;完成登录后，你可以重新访问一次 &lt;code class=&quot;highlighter-rouge&quot;&gt;https://travis-ci.com/&lt;/code&gt;，这时页面看起来应该是这个样子：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/uploads/02260587c5931746217a78efc3b271e.png&quot; alt=&quot;02260587c5931746217a78efc3b271e&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;你只需要点击 &lt;code class=&quot;highlighter-rouge&quot;&gt;ACTIVATE ALL REPOSITORIES USING GITHUB APPS&lt;/code&gt; 按钮，并按照他们的要求完成操作即可。&lt;/p&gt;
+
+&lt;p&gt;至此，你的 Travis CI 就配置完了。&lt;/p&gt;
+
 &lt;hr /&gt;
 
 &lt;p&gt;参考的文章：&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;[]&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://docs.travis-ci.com/user/deployment-v2/providers/pages/&quot;&gt;https://docs.travis-ci.com/user/deployment-v2/providers/pages/&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://jekyllrb.com/docs/continuous-integration/travis-ci/&quot;&gt;https://jekyllrb.com/docs/continuous-integration/travis-ci/&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4&quot;&gt;https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><category term="随笔" /><summary type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</summary></entry></feed>
+&lt;/ul&gt;</content><author><name></name></author><category term="jekyll" /><summary type="html">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</summary></entry></feed>

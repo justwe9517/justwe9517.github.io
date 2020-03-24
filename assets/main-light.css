@@ -49,6 +49,9 @@ blockquote {
   blockquote p {
     margin: 6px 0; }
 
+img {
+  max-width: 100%; }
+
 hr {
   border-bottom: 1px solid #333333;
   border-top: 0;
@@ -274,13 +277,13 @@ textarea {
  * Code and syntax highlighting
  */
 pre {
-  background-color: #fff;
   border: none;
   padding: 0px;
   overflow: auto;
   font-size: 16px;
   color: rgba(255, 255, 255, 0.65);
-  line-height: 1.7 !important; }
+  line-height: 1.7 !important;
+  margin: 0; }
 
 .highlight .c {
   color: #999988;

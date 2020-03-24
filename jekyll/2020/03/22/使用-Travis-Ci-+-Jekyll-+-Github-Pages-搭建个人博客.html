@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+<body>
+    <div class="container"><header>
+    <div class="menu">
+        <ul style="display: flex; flex: 1;">
+            <li><a href="/">夏虫的博客</a></li>
+        </ul>
+        <ul>
+            <li><a href="/">最新</a></li>
+            <li><a href="/categories.html">分类</a></li>
+            <li><a href="/tags.html">标签</a></li>
+            <li><a href="/collections.html">专题</a></li>
+        </ul>
+    </div>
+</header><main class="main">
+        <style>
+    header {
+        margin-bottom: 0 !important;
+    }
+</style>
+
+<div>
+<h1 id="使用-travis-ci--jekyll--github-pages-搭建个人博客">使用 Travis Ci + Jekyll + Github Pages 搭建个人博客</h1>
+
+<p>一直想找一个比较好的博客平台来写博客，在尝试众多平台之后最终选择使用 Github Pages 来自己搭建一个博客。</p>
+
+<p>Github Pages 的整个搭建过程其实并不复杂，但无奈网上的文章坑太多，让我在搭建的过程中走了不少弯路，于是计划新写一篇文章来好好的总结一下整个搭建过程。</p>
+
+<p>太长不看版：</p>
+
+<blockquote>
+  <p>直接 fork 我这个<a href="https://github.com/justwe9517/justwe9517.github.io">博客项目</a>，然后参考<code class="highlighter-rouge">集成 Travis CI 平台</code>那一节完成 Travis CI 的配置，之后直接在 write 分支中写文章即可。</p>
+</blockquote>
+
+<p>下面进入正文：</p>
+
+<h2 id="什么是-github-pages">什么是 Github Pages</h2>
+
+<blockquote>
+  <p>GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程运行文件，然后发布网站。</p>
+</blockquote>
+
+<p>构建过程运行文件就是 Github Pages 默认集成的 Jekyll 服务，通过这个服务你可以很轻松的发布自己的 markdown 文本并交给 Jekyll 来解析，自动生成静态文件。</p>
+
+<p>Github Pages 提供了三种类型的仓库，分别为项目、用户和组织。</p>
+
+<blockquote>
+  <p>你可在此文档中查看 Github Pages 支持的具体类型：<a href="https://help.github.com/cn/github/working-with-github-pages/about-github-pages#">https://help.github.com/cn/github/working-with-github-pages/about-github-pages#</a></p>
+</blockquote>
+
+<p>后续文档我会以 <code class="highlighter-rouge">用户</code> 类型站点为模板进行讲解。</p>
+
+<h2 id="什么是-travis-ci">什么是 Travis CI</h2>
+
+<p>简单点理解 Travis Ci 就是一个自动化操作平台（实际上功能非常强大），你只需要知道它能代替你执行所有操作，你只需要关注如何写好文章，其他的事情都交给 Travis CI 来就好了。</p>
+
+<h2 id="为什么使用-travis-ci-进行构建">为什么使用 Travis Ci 进行构建</h2>
+
+<p>虽然 Github Pages 内置了 Jekyll 服务，但却不支持使用自定义插件，这就限制了 Github Pages 的使用场景。</p>
+
+<p>现在咱们来看看，如果不使用 Github Pages 内置的 Jekyll 服务构建，通过手动的方式发布文章，需要进行哪几步骤操作：</p>
+
+<ol>
+  <li>安装 Ruby 环境。</li>
+  <li>安装 Git 服务。</li>
+  <li>安装 Jekyll 服务。</li>
+  <li>克隆项目。</li>
+  <li>在 _post 目录中编辑文章。</li>
+  <li>通过命令生成 _site 目录。</li>
+  <li>使用 git 推送更改。</li>
+</ol>
+
+<p>再来看看，如果使用 Travis-Ci 发布文章需要哪几个步骤：</p>
+
+<ol>
+  <li>安装 Git 服务，克隆项目，在 _post 目录中编辑文章，使用 git 推送更改。</li>
+</ol>
+
+<p>好了，经过我上面的简单介绍，我想大家也都清楚 Travis-Ci 是个多么强大的生产力工具。你甚至可以直接在 github.com 网站上直接编写文章。</p>
+
+<h2 id="搭建环境">搭建环境</h2>
+
+<p>搭建一个 Github Pages 平台需要具备如下条件：</p>
+
+<ol>
+  <li>拥有一个 Github 账号，没有的去这里 <a href="https://github.com/">https://github.com/</a> 注册一个。</li>
+  <li>会熟练使用 Git 命令，不会的需要在 <a href="https://git-scm.com/book/zh/v2">https://git-scm.com/book/zh/v2</a> 简单学习一下。</li>
+  <li>知道如何创建 Jekyll 项目，不会的需要在 <a href="https://jekyllrb.com/docs/installation/">https://jekyllrb.com/docs/installation/</a> 学习一下如何创建项目。</li>
+</ol>
+
+<p>在继续浏览后续文章之前，请务掌握上面三点，因为我不会在介绍如何使用 git 命令，以及如何在不同平台下创建 Jekyll 项目了。不过，你可以直接 fork 我的项目，这样你就不需要在掌握第三条了 :-)。</p>
+
+<h3 id="创建仓库">创建仓库</h3>
+
+<p>首先进入 Github 点击右上角的加号，如下图所示：</p>
+
+<p><img src="/assets/uploads/c432a25a298f467960517f517ff72c9.png" alt="c432a25a298f467960517f517ff72c9" /></p>
+
+<p>进入 <code class="highlighter-rouge">Create a new repository</code> 页面后按照图中的要求操作：</p>
+
+<p><img src="/assets/uploads/08a4a7ce65eb13958c7f2e4e10a64cd.png" alt="08a4a7ce65eb13958c7f2e4e10a64cd" /></p>
+
+<p>点击 <code class="highlighter-rouge">Create repository</code> 按钮即可完成项目创建。</p>
+
+<p>项目创建完成之后先来对项目进行一下简单的配置，首选你需要先创建一个 write 分支，并将其设置为默认分支，操作步骤如下：</p>
+
+<ol>
+  <li>在项目的 Code 选项卡中，找到左下角的 <code class="highlighter-rouge">Branch: master</code> 下拉框：
+ <img src="/assets/uploads/e1575eca8e5984ae29b721b4c60db24.png" alt="e1575eca8e5984ae29b721b4c60db24" /></li>
+  <li>点击下拉框并在输入框内输入 <code class="highlighter-rouge">write</code> 名称，如果 <code class="highlighter-rouge">write</code> 分支不存在，下方的文字应该为 <code class="highlighter-rouge">Create branch: write from 'master'</code>，点击它创建分支，创建成功后上图的 <code class="highlighter-rouge">1 branch</code> 会变成 <code class="highlighter-rouge">2 branch</code>。
+ <img src="/assets/uploads/48f12cf7589d4548e783f5201dbed62.png" alt="48f12cf7589d4548e783f5201dbed62" /></li>
+  <li>分支创建成功后，只需要在将其设置为默认分支即可。
+步骤：你需要在选项卡中点击 Settings 按钮进入项目设置页面，并在左侧的导航中找到 <code class="highlighter-rouge">Branches</code> 菜单，点击菜单后，右侧页面会出现 <code class="highlighter-rouge">Default branch</code> 文字，你在下来菜单中选中 <code class="highlighter-rouge">write</code> 分支，并点击旁边的 <code class="highlighter-rouge">update</code> 按钮即可。</li>
+</ol>
+
+<p>完成上面的三步之后，你就可以导入代码了。</p>
+
+<p>你需要先添加一些内容进去，可以直接去 <code class="highlighter-rouge">https://github.com/justwe9517/justwe9517.github.io</code> 下载我的模板，也可以导入其他 Jekyll 项目的模板。</p>
+
+<h3 id="配置项目">配置项目</h3>
+
+<p>下图是一个标准的 Jekyll 项目目录结构。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>_includes
+_layouts
+_posts
+_sass
+assets
+script
+.gitignore
+404.html
+README.md
+_config.yml
+index.md
+</code></pre></div></div>
+
+<p>我们需要在这个目录中加几个文件进去，告诉 Travis CI 如何处理这个项目。</p>
+
+<p>如果你是使用我的网站源码，那你可以直接跳过这部分！</p>
+
+<p>对于没使用我的站点源码的朋友，我现在仔细说说需要添加哪些文件进去。</p>
+
+<h4 id="gemfile-文件">Gemfile 文件</h4>
+
+<p>首先，你需要在项目的跟目录中添加名为 <code class="highlighter-rouge">Gemfile</code> 的配置文件，并将下面的内容复制进去，此文件的作用是处理项目依赖。</p>
+
+<p>你可以在这里找到下面代码的作用：<a href="https://jekyllrb.com/docs/continuous-integration/travis-ci/">Jekyll Deployment Travis CI</a></p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> <span class="s2">"https://rubygems.org"</span>
+
+gem <span class="s2">"jekyll"</span>, <span class="s2">"~&gt; 3.8.5"</span>
+gem <span class="s2">"minima"</span>, <span class="s2">"~&gt; 2.0"</span>
+group :jekyll_plugins <span class="k">do
+  </span>gem <span class="s2">"jekyll-feed"</span>, <span class="s2">"~&gt; 0.6"</span>
+end
+gem <span class="s2">"tzinfo-data"</span>, platforms: <span class="o">[</span>:mingw, :mswin, :x64_mingw, :jruby]
+gem <span class="s2">"wdm"</span>, <span class="s2">"~&gt; 0.1.0"</span> <span class="k">if </span>Gem.win_platform?
+gem <span class="s2">"rake"</span>
+gem <span class="s2">"html-proofer"</span>
+gem <span class="s2">"jekyll-theme-console"</span>
+gem <span class="s2">"jekyll-paginate-v2"</span>
+<span class="c"># 自定义插件都要写到这里</span>
+</code></pre></div></div>
+
+<h4 id="travisyml-文件">.travis.yml 文件</h4>
+
+<p>之后，你需要在项目的跟目录中添加名为 <code class="highlighter-rouge">.travis.yml</code> 的配置文件，继续将下面的内容复制进去，此文件的作用是告诉 Travis CI 如何处理此项目。</p>
+
+<p>你可以在这里找到下面代码的作用：<a href="https://jekyllrb.com/docs/continuous-integration/travis-ci/">Jekyll Deployment Travis CI</a>，<a href="https://docs.travis-ci.com/user/deployment-v2/providers/pages/">Travis CI GitHub Pages Deployment</a></p>
+
+<p>Jekyll Deployment Travis CI 文章会告诉你如何在 Travis CI 中生成 _site 目录。</p>
+
+<p>Travis CI GitHub Pages Deployment 文章会告诉你如何部署到 Github Pages 中。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">language</span><span class="pi">:</span> <span class="s">ruby</span>
+<span class="na">rvm</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">2.6.3</span>
+<span class="na">before_script</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">chmod +x ./script/cibuild</span>
+<span class="na">script</span><span class="pi">:</span> <span class="s">./script/cibuild</span>
+<span class="na">branches</span><span class="pi">:</span>
+    <span class="na">only</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">write</span>
+        <span class="pi">-</span> <span class="s">master</span>
+<span class="na">env</span><span class="pi">:</span>
+    <span class="na">global</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">NOKOGIRI_USE_SYSTEM_LIBRARIES=true</span>
+<span class="na">addons</span><span class="pi">:</span>
+    <span class="na">apt</span><span class="pi">:</span>
+        <span class="na">packages</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">libcurl4-openssl-dev</span>
+<span class="na">sudo</span><span class="pi">:</span> <span class="no">false</span>
+<span class="na">cache</span><span class="pi">:</span> <span class="s">bundler</span>
+<span class="na">notifications</span><span class="pi">:</span>
+    <span class="na">email</span><span class="pi">:</span> <span class="no">false</span>
+
+<span class="na">deploy</span><span class="pi">:</span>
+    <span class="na">provider</span><span class="pi">:</span> <span class="s">pages:git</span>
+    <span class="na">token</span><span class="pi">:</span> <span class="s">$PAGES_TOKEN</span>
+    <span class="na">edge</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># opt in to dpl v2</span>
+    <span class="na">target_branch</span><span class="pi">:</span> <span class="s">master</span>
+    <span class="na">local_dir</span><span class="pi">:</span> <span class="s1">'</span><span class="s">./_site'</span>
+    <span class="na">on</span><span class="pi">:</span>
+        <span class="na">branch</span><span class="pi">:</span> <span class="s">write</span>
+</code></pre></div></div>
+
+<h4 id="scriptcibuild-文件">script/cibuild 文件</h4>
+
+<p>还差最后一个文件，你需要在项目的跟目录中创建一个名为 <code class="highlighter-rouge">script</code> 的目录，并在这个目录中在创建一个 <code class="highlighter-rouge">cibuild</code> 文件，并将下面的内容复制进去，此文件是 Travis CI 的一部分。</p>
+
+<p>你可以在这里找到下面代码的作用：<a href="https://jekyllrb.com/docs/continuous-integration/travis-ci/">Jekyll Deployment Travis CI</a></p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/usr/bin/env bash</span>
+<span class="nb">set</span> <span class="nt">-e</span> <span class="c"># halt script on error</span>
+
+bundle <span class="nb">exec </span>jekyll build
+bundle <span class="nb">exec </span>htmlproofer ./_site
+</code></pre></div></div>
+
+<p>完成上面几步之后，你的目录看起来应该是下面这个样子：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>_includes
+_layouts
+_posts
+_sass
+assets
+script
+.gitignore
+404.html
+README.md
+_config.yml
+index.md
+Gemfile           <span class="c"># 新添加的文件</span>
+.travis-ci.yml    <span class="c"># 新添加的文件</span>
+script/cibuild    <span class="c"># 新添加的文件</span>
+</code></pre></div></div>
+
+<p>如果确认无误，那这个项目就配置好了，接下来只需要简单的配置一下 Travis CI，你就可以享受由 Github Pages 带来的爽快感。</p>
+
+<h3 id="集成-travis-ci-平台">集成 Travis CI 平台</h3>
+
+<p>在浏览器中 <code class="highlighter-rouge">https://travis-ci.com/</code> 进入 Travis CI 网站，注意不要进入到 <code class="highlighter-rouge">https://travis-ci.org/</code> 网站，前者是收费版，但如果是开源项目可以免费享受到构建。</p>
+
+<p>在这个网站中你可以点击右上角的 <code class="highlighter-rouge">Sign in</code> 按钮，使用 <code class="highlighter-rouge">SIGN IN WITH GITHUB</code> 进行登录。</p>
+
+<p>完成登录后，你可以重新访问一次 <code class="highlighter-rouge">https://travis-ci.com/</code>，这时页面看起来应该是这个样子：</p>
+
+<p><img src="/assets/uploads/02260587c5931746217a78efc3b271e.png" alt="02260587c5931746217a78efc3b271e" /></p>
+
+<p>你只需要点击 <code class="highlighter-rouge">ACTIVATE ALL REPOSITORIES USING GITHUB APPS</code> 按钮，并按照他们的要求完成操作即可。</p>
+
+<p>至此，你的 Travis CI 就配置完了。</p>
+
+<hr />
+
+<p>参考的文章：</p>
+
+<ul>
+  <li><a href="https://docs.travis-ci.com/user/deployment-v2/providers/pages/">https://docs.travis-ci.com/user/deployment-v2/providers/pages/</a></li>
+  <li><a href="https://jekyllrb.com/docs/continuous-integration/travis-ci/">https://jekyllrb.com/docs/continuous-integration/travis-ci/</a></li>
+  <li><a href="https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4">https://travis-ci.community/t/failed-to-deploy-simple-github-pages/3335/4</a></li>
+</ul>
+
+
+
+<hr>
+<div id="gitment-container"></div>
+<script src="https://billts.site/js/gitment.js"></script>
+<script>
+    var gitment = new Gitment({
+        id: '<%= page.date %>',
+        owner: 'justwe9517',
+        repo: 'justwe9517.github.io.comment',
+        oauth: {
+            client_id: '5478f070853e6da796cb',
+            client_secret: '8e2107cb4181d5ec16429b919b334cf936b289b1',
+        },
+    });
+    gitment.render('gitment-container')
+</script>
+
+</div>
+    </main><footer>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
+    COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+    <script>
+        window.onload = function () {
+            var script = document.createElement('script');
+            script.setAttribute('type', "text/javascript");
+            script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
+            script.style.opacity = 0;
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
+        };
+    </script>
+</footer>
+</div>
+  </body>
+</html>
