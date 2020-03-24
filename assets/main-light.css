@@ -110,9 +110,6 @@ a:hover {
 .primary-text {
   color: #0000EE; }
 
-@media only screen and (max-device-width: 500px) {
-  * {
-    font-size: 14px !important; } }
 /*h1:before { content: "#";  margin-right: 9px; }
 h2:before { content: "##";  margin-right: 9px; }
 h3:before { content: "###";  margin-right: 9px; }
