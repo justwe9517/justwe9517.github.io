@@ -331,8 +331,7 @@ a.gitment-editor-logout-link:hover {
   line-height: 1.6;
 
   background: #1a1a1a;
-
-  color: #333;
+  color: #dbdbdb;
   vertical-align: middle;
   border: none;
   border-radius: 0;
@@ -643,13 +642,6 @@ a.gitment-editor-footer-tip:hover {
   overflow: hidden;
 }
 
-.gitment-markdown code,
-.gitment-markdown kbd,
-.gitment-markdown pre {
-  font-family: monospace, monospace;
-  font-size: 1em;
-}
-
 .gitment-markdown hr {
   box-sizing: content-box;
   height: 0;
@@ -795,17 +787,9 @@ a.gitment-editor-footer-tip:hover {
   margin-left: 0;
 }
 
-.gitment-markdown code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace;
-  font-size: 12px;
-}
-
 .gitment-markdown pre {
   margin-top: 0;
   margin-bottom: 0;
-  font: 12px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace;
 }
 
 .gitment-markdown .octicon {
@@ -1106,8 +1090,11 @@ a.gitment-editor-footer-tip:hover {
   overflow: auto;
   font-size: 85%;
   line-height: 1.45;
-  background-color: #f5f5f5;
   border-radius: 0;
+  background: #101010;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid black;
 }
 
 .gitment-markdown pre code {
