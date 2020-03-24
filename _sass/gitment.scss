@@ -145,13 +145,14 @@ a.gitment-header-issue-link:hover {
 .gitment-comment-main {
   position: relative;
   border: 1px solid #000000;
-  border-radius: 0;
+  border-radius: 4px;
   background: #1a1a1a;
 }
 .gitment-editor-main {
   position: relative;
   border: 1px solid #000000;
-  border-radius: 0;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .gitment-editor-main::before,
