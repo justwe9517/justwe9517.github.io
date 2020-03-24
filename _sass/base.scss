@@ -59,6 +59,10 @@ blockquote {
     }
 }
 
+img {
+    max-width: 100%;
+}
+
 hr {
     border-bottom: 1px solid $border-color;
     border-top: 0;

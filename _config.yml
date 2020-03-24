@@ -20,6 +20,13 @@ url: ''
 twitter_username: justwe9517
 github_username: justwe9517
 footer: 主题使用 jekyll-theme-console 并在它的基础上就行了大幅修改
+gitment:
+  enable: true
+  github_id: justwe9517
+  repo: justwe9517.github.io.comment
+  client_id: 5478f070853e6da796cb
+  client_secret: 8e2107cb4181d5ec16429b919b334cf936b289b1
+  lazy: true
 pagination:
   enabled: true
   debug: true
