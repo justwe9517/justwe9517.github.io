@@ -75,11 +75,13 @@
 .gitment-header-like-btn svg {
   vertical-align: middle;
   height: 30px;
+  fill: #f44336;
 }
 
 .gitment-comment-like-btn svg {
   vertical-align: middle;
   height: 20px;
+  fill: #f44336;
 }
 
 .gitment-header-like-btn.liked svg,
@@ -142,8 +144,9 @@ a.gitment-header-issue-link:hover {
 
 .gitment-comment-main {
   position: relative;
-  border: 1px solid #7ea4ca;
+  border: 1px solid #000000;
   border-radius: 0;
+  background: #101010;
 }
 .gitment-editor-main {
   position: relative;
@@ -340,7 +343,7 @@ a.gitment-editor-logout-link:hover {
 }
 
 .gitment-editor-body textarea:focus {
-  background-color: #fff;
+  background-color: #1a1a1a;
 }
 
 .gitment-editor-preview {
