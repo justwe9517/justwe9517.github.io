@@ -2,11 +2,10 @@
 title: 使用 Travis Ci + Jekyll + Github Pages 搭建个人博客
 date: 2020-03-22 15:24:00 Z
 categories:
-- Jekyll
+- jekyll
 tags:
-- Jekyll
+- jekyll
 layout: post
-collection: Jekyll
 ---
 
 # 使用 Travis Ci + Jekyll + Github Pages 搭建个人博客
