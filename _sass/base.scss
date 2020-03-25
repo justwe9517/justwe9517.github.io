@@ -117,7 +117,6 @@ ul,
 ol {
     color: $text-color;
     margin: 12px 0;
-    text-align: justify;
 }
 
 a {
@@ -159,7 +158,6 @@ p {
     word-wrap: break-word;
     word-break: break-word;
     white-space: pre-wrap;
-    text-align: justify;
 }
 
 footer {
@@ -685,5 +683,17 @@ pre {
     .gitment-editor-main::before, .gitment-comment-main::before {
     border-width: none !important;
     border-right-color: none !important;
+    }
+    #cnzz {
+        display: none;
+    }
+    footer {
+        display: flex;
+        flex-direction: column-reverse;
+        height: 45px;
+        #travis-ci {
+            margin-top: 5px;
+            flex: 0!important;
+        }
     }
 }
