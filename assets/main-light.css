@@ -132,8 +132,7 @@ h6:before { content: "######";  margin-right: 9px; }*/
 p {
   word-wrap: break-word;
   word-break: break-word;
-  white-space: pre-wrap;
-  text-align: justify; }
+  white-space: pre-wrap; }
 
 footer {
   color: #000;
@@ -545,3 +544,38 @@ pre {
   padding: 3px 6px;
   border-radius: 4px;
   border: 1px solid black; }
+
+:not(.menu) > ul > li:before {
+  content: "";
+  margin-right: 9px; }
+
+@media only screen and (max-width: 840px) {
+  .main {
+    width: auto; }
+
+  .gitment-comment-avatar {
+    display: none; }
+
+  .gitment-editor-avatar {
+    display: none; }
+
+  .highlighter-rouge {
+    width: calc(100vw - 40px); }
+
+  .gitment-comment, .gitment-editor-container {
+    padding-left: 0 !important; }
+
+  .gitment-editor-main::before, .gitment-comment-main::before {
+    border-width: none !important;
+    border-right-color: none !important; }
+
+  #cnzz {
+    display: none; }
+
+  footer {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 45px; }
+    footer #travis-ci {
+      margin-top: 5px;
+      flex: 0 !important; } }
