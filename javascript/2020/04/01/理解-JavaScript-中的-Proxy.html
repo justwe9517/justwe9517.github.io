@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>理解 JavaScript 中的 Proxy</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+<body>
+    <div class="container"><header>
+    <div class="menu">
+        <ul style="display: flex; flex: 1;">
+            <li><a href="/">夏虫的博客</a></li>
+        </ul>
+        <ul>
+            <li><a href="/">最新</a></li>
+            <li><a href="/categories.html">分类</a></li>
+            <li><a href="/tags.html">标签</a></li>
+            <li><a href="/collections.html">专题</a></li>
+        </ul>
+    </div>
+</header><main class="main">
+        <style>
+    header {
+        margin-bottom: 0 !important;
+    }
+</style>
+
+<div>
+<h1 id="理解-javascript-中的-proxy">理解 JavaScript 中的 Proxy</h1>
+
+<p>Proxy 是 ES6 中提供的一种新 API，翻译过来就是代理的意思，指代理人帮助委托人处理有关的事务，你可以简单的理解为通过 Proxy 你可以对 Object 中的任何行为并加以修饰，并返回修饰后的数据。</p>
+
+<p>下面先看一下关于 JavaScript Proxy 中的声明信息：</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nx">proxy</span><span class="p">(</span><span class="nx">target</span><span class="p">:</span> <span class="p">{},</span> <span class="nx">handler</span><span class="p">:</span> <span class="nx">ProxyHandler</span><span class="o">&lt;</span><span class="p">{}</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p>由此声明可知，Proxy 接收两个参数，分别是 target 和 handler，其中 target 是指需要被代理的对象（可以是任何类型），而 handler 是一个代理句柄，他接收的是一个 ProxyHandler 对象，此对象在 mdn 中解释为 <code class="highlighter-rouge">包含陷阱（trap）的占位符对象，可译为处理器对象。</code>，关于此对象的详细信息如下：</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">ProxyHandler</span><span class="o">&lt;</span><span class="nx">T</span> <span class="kd">extends</span> <span class="nx">object</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// 当读取代理对象的原型时，该方法会被调用</span>
+    <span class="nx">getPrototypeOf</span><span class="p">?</span> <span class="p">(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">object</span> <span class="o">|</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="c1">// 当使用 Object.setPrototypeOf() 方法为代理对象设置新的原型时被触发</span>
+    <span class="nx">setPrototypeOf</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">v</span><span class="p">:</span> <span class="nx">any</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当使用 Object.isExtensible() 方法检查代理对象是否可扩展时触发</span>
+    <span class="nx">isExtensible</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当使用 Object.preventExtensions() 方法让一个代理对象变成不可扩展时触发</span>
+    <span class="nx">preventExtensions</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当使用 Object.getOwnPropertyDescriptor() 方法获取代理对象上一个自有属性对应的属性描述符时触发</span>
+    <span class="nx">getOwnPropertyDescriptor</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">p</span><span class="p">:</span> <span class="nx">PropertyKey</span><span class="p">):</span> <span class="nx">PropertyDescriptor</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">;</span>
+    <span class="c1">// 当使用 in 操作符检查代理对象属性时触发</span>
+    <span class="nx">has</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">p</span><span class="p">:</span> <span class="nx">PropertyKey</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当读取代理对象属性时触发</span>
+    <span class="kd">get</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">p</span><span class="p">:</span> <span class="nx">PropertyKey</span><span class="p">,</span> <span class="na">receiver</span><span class="p">:</span> <span class="nx">any</span><span class="p">):</span> <span class="nx">any</span><span class="p">;</span>
+    <span class="c1">// 当设置代理对象属性时触发</span>
+    <span class="kd">set</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">p</span><span class="p">:</span> <span class="nx">PropertyKey</span><span class="p">,</span> <span class="na">value</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span> <span class="na">receiver</span><span class="p">:</span> <span class="nx">any</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当使用 delete 关键字操作代理对象的属性时触发</span>
+    <span class="nx">deleteProperty</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">p</span><span class="p">:</span> <span class="nx">PropertyKey</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当使用 Object.defineProperty() 方法为代理对象创建或修改属性时触发</span>
+    <span class="nx">defineProperty</span><span class="p">?</span> <span class="p">(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">p</span><span class="p">:</span> <span class="nx">PropertyKey</span><span class="p">,</span> <span class="na">attributes</span><span class="p">:</span> <span class="nx">PropertyDescriptor</span><span class="p">):</span> <span class="nx">boolean</span><span class="p">;</span>
+    <span class="c1">// 当枚举代理对象属性时触发</span>
+    <span class="nx">enumerate</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">PropertyKey</span><span class="p">[];</span>
+    <span class="c1">// 当使用 Reflect.ownKeys() 方法操作代理对象时触发</span>
+    <span class="nx">ownKeys</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">PropertyKey</span><span class="p">[];</span>
+    <span class="c1">// 当被代理对象尝试使用函数方式调用时被触发</span>
+    <span class="nx">apply</span><span class="p">?(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">thisArg</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">argArray</span><span class="p">?:</span> <span class="nx">any</span><span class="p">):</span> <span class="nx">any</span><span class="p">;</span>
+    <span class="c1">// 用于拦截 new 关键字，为了使 new 操作符在生成的 Proxy 对象上生效，用于初始化代理的目标对象自身必须具有[[Construct]]内部方法（即 new target 必须是有效的）。</span>
+    <span class="nx">construct</span><span class="p">?</span> <span class="p">(</span><span class="nx">target</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="na">argArray</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">newTarget</span><span class="p">?:</span> <span class="nx">any</span><span class="p">):</span> <span class="nx">object</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>通过上面的简单介绍，我们可以知道 JavaScript Proxy 提供了很多代理方法，这些方法被称为 <code class="highlighter-rouge">trap</code> 捕获器，这些 <code class="highlighter-rouge">trap</code> 都是可选参数，如果一个代理中未定义任何 <code class="highlighter-rouge">trap</code> 那么会保留代理对象的默认行为。</p>
+
+<h2 id="如何使用-proxy">如何使用 Proxy</h2>
+
+<p>我们通过一个简单的实例来了解一下如何使用 proxy 来代理对象：</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">Source</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">world</span><span class="p">:</span> <span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span>
+<span class="p">};</span>
+
+<span class="kd">let</span> <span class="nx">SourceProxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Proxy</span><span class="p">(</span><span class="nx">Source</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">get</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Source</span><span class="p">.</span><span class="nx">world</span><span class="p">,</span> <span class="nx">SourceProxy</span><span class="p">.</span><span class="nx">world</span><span class="p">);</span> <span class="c1">// hello world</span>
+</code></pre></div></div>
+
+<p>上面的代码中 Source 为源对象，SourceProxy 为代理后的新对象，通过调用两个对象中的 world 属性可以看到，Source.world 输出了 hello，而 SourceProxy.world 却输出了 world 字符串。</p>
+
+<p>由此可见，当调用 SourceProxy 的对象中的 world 属性时，此 world 属性在 Proxy get 中被修改了。</p>
+
+<p>通过上面这个例子我们已经知道如何简单的去使用 Proxy 进行代理。现在让我们在看一个例子：</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">Source</span> <span class="p">{</span>
+    <span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">world</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">SourceProxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Proxy</span><span class="p">(</span><span class="nx">Source</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">get</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">Source</span><span class="p">().</span><span class="nx">world</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">SourceProxy</span><span class="p">().</span><span class="nx">world</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>先别急着看答案，简单花些时间思考一下上面这段代码会输出什么，并思考一下为什么会出现这种情况。</p>
+
+<p>思考完了吗，现在我公布一下答案：</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">Source</span><span class="p">().</span><span class="nx">world</span><span class="p">);</span>         <span class="c1">// hello</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">SourceProxy</span><span class="p">().</span><span class="nx">world</span><span class="p">);</span>    <span class="c1">// TypeError: 'get' on proxy: property 'prototype' is a read-only and non-configurable data property on the proxy target but the proxy did not return its actual value (expected '#&lt;Source&gt;' but got 'prototype')</span>
+</code></pre></div></div>
+
+<p>当我们调用 <code class="highlighter-rouge">console.log(new SourceProxy().world);</code> 属性时会发现给我们抛出了一个 ` TypeError: ‘get’ on proxy: property ‘prototype’ is a read-only and non-configurable data property on the proxy target but the proxy did not return its actual value (expected ‘#<source />’ but got ‘prototype’)` 异常信息。</p>
+
+<p>让我们研究一下为为什么会出现这个问题，先简单回顾一下 <code class="highlighter-rouge">ProxyHandler</code> 中的 <code class="highlighter-rouge">trap</code> 有哪些，如果不记得可以在文章开头看看关于 ProxyHandler 的定义，我们会发现有一个 <code class="highlighter-rouge">construct</code> 方法。关于此方法的说明是 <code class="highlighter-rouge">为了使 new 操作符在生成的 Proxy 对象上生效，用于初始化代理的目标对象自身必须具有[[Construct]]内部方法（即 new target 必须是有效的）</code>，知道问题对症下药，只需要实现 <code class="highlighter-rouge">construct</code> 方法就好了。</p>
+
+<p>修改完的代码是这样的：</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">Source</span> <span class="p">{</span>
+    <span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">world</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">SourceProxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Proxy</span><span class="p">(</span><span class="nx">Source</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">construct</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">target</span><span class="p">(...</span><span class="nx">args</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="na">get</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">Source</span><span class="p">().</span><span class="nx">world</span><span class="p">);</span>      <span class="c1">// hello</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">SourceProxy</span><span class="p">().</span><span class="nx">world</span><span class="p">);</span> <span class="c1">// hello</span>
+</code></pre></div></div>
+
+<p>执行代码后我们发现 <code class="highlighter-rouge">get</code> 这个方法并没有被执行，如果你不理解为什么 <code class="highlighter-rouge">get</code> 方法没有执行，那我推荐你去了解一下 JavaScript getter setter 的相关知识。</p>
+
+
+
+<hr>
+<div id="gitment-container"></div>
+<script src="https://billts.site/js/gitment.js"></script>
+<script>
+    var gitment = new Gitment({
+        id: 'article',
+        owner: 'justwe9517',
+        repo: 'justwe9517.github.io.comment',
+        oauth: {
+            client_id: '5478f070853e6da796cb',
+            client_secret: '8e2107cb4181d5ec16429b919b334cf936b289b1',
+        },
+    });
+    gitment.render('gitment-container')
+</script>
+
+</div>
+    </main><footer>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
+    COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+    <script>
+        window.onload = function () {
+            var script = document.createElement('script');
+            script.setAttribute('type', "text/javascript");
+            script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
+            script.style.opacity = 0;
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
+        };
+    </script>
+</footer>
+</div>
+  </body>
+</html>
