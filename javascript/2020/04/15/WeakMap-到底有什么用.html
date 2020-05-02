@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WeakMap 到底有什么用</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+<body>
+    <div class="container"><header>
+    <div class="menu">
+        <ul style="display: flex; flex: 1;">
+            <li><a href="/">夏虫的博客</a></li>
+        </ul>
+        <ul>
+            <li><a href="/">最新</a></li>
+            <li><a href="/categories.html">分类</a></li>
+            <li><a href="/tags.html">标签</a></li>
+            <li><a href="/collections.html">专题</a></li>
+        </ul>
+    </div>
+</header><main class="main">
+        <style>
+    header {
+        margin-bottom: 0 !important;
+    }
+</style>
+
+<div>
+<p>在我最近阅读 vue3.0 源码时我发现其中使用到了 WeakMap 对象，而在此之前我 tm 的居然从来没有关注过这个对象，这也从一方面反映出我的底子有多薄。所以为了方便理解 vue3.0 我查阅了不少的资料，并写了此文方便大家理解 WeakMap 对象。</p>
+
+<p>WeakMap 在 ES6 中新增的对象。这个对象与 HashMap 类似，也是键值对的合集，并且有一致的操作接口。但是与 HashMap 不同的是 WeakMap 中的键必须是一个对象，而值可以是却可以是任意一个类型。</p>
+
+<p>以下是 WeakMap 中特有的一些特性</p>
+
+<ol>
+  <li>WeakMap 使用的弱引用。</li>
+  <li>WeakMap 中的键值所指的对象如果在其他地方没有引用的时候，就会被 GC 掉。</li>
+  <li>WeakMap 不可以被枚举，列表状态是否存在取决于 GC 的状态。</li>
+</ol>
+
+<h2 id="那-weakmap-到底有什么用呢">那 WeakMap 到底有什么用呢？</h2>
+
+<p>我们通过下面这段代码来理解一下 WeakMap 的不同之处：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">weakMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">WeakMap</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">elObj</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">"</span><span class="s2">custom-tags</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">extObj</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">);</span>
+<span class="nx">weakMap</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">elObj</span><span class="p">,</span> <span class="p">{</span> <span class="nx">extObj</span> <span class="p">});</span>
+<span class="nx">elObj</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>现在我来解释一下这段代码的意思，同时在抛出两个个问题，大家在看答案之前自己先思考一下：</p>
+
+<ol>
+  <li>第一行是先创建一个 WeakMap 对象。</li>
+  <li>第二行是获取一个 HTML 对象。</li>
+  <li>第三行是创建一个扩展对象，用于对指定元素存储一些数据。</li>
+  <li>第四行是将 HTML 对象与扩展对象进行绑定。</li>
+  <li>第五行是将 elObj 变量赋值未空。</li>
+</ol>
+
+<p>问题：</p>
+
+<ol>
+  <li>在上面的代码中 extObj 变量被释放了吗？</li>
+  <li>如果将 new WeakMap() 换成 new Map() 有会遇见什么情况。</li>
+</ol>
+
+<p>好了，自己想想这两个问题，然后我下面公布答案。</p>
+
+<p>对于第一个问题，答案是 extObj 被释放掉了。原因在于 WeakMap 中的键值是使用的弱引用，也就说在 WeakMap 上的键值并没有真正的被引用，所以如果 elObj 被销毁了，GC 会认为 extObj 没有被任何地方引用，所以在一下 GC 中会被销毁。</p>
+
+<p>对于第二个问题，如果将 WeakMap 换成 Map 对象，即使你释放掉了 extObj 对象，但 Map 与 extObj 之间仍然是强引用关系，所以 GC 并不会销毁 extObj 变量。为了释放空间，你必须手动调用 <code class="highlighter-rouge">weakMap.delete(elObj)</code> 来释放空间。</p>
+
+<h2 id="那什么情况下需要使用到-weakmap-对象">那什么情况下需要使用到 WeakMap 对象</h2>
+
+<ol>
+  <li>为对象保存一些额外数据，同时不影响对象本身，并且当对象销毁后，自动释放这些额外数据。</li>
+  <li>基于不可枚举的特性，可以为对象配置私有属性，不过考虑到 <code class="highlighter-rouge">es2020</code> 中已经使用 <code class="highlighter-rouge">#</code> 来设置私有属性，所以这个特点也就不算是什么特点了。</li>
+</ol>
+
+
+
+<hr>
+<div id="gitment-container"></div>
+<script src="/assets/gitment.js"></script>
+<script>
+    var gitment = new Gitment({
+        id: 'article',
+        owner: 'justwe9517',
+        repo: 'justwe9517.github.io.comment',
+        oauth: {
+            client_id: '5478f070853e6da796cb',
+            client_secret: '8e2107cb4181d5ec16429b919b334cf936b289b1',
+        },
+    });
+    gitment.render('gitment-container')
+</script>
+
+</div>
+    </main><footer>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
+    COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+    <script>
+        window.onload = function () {
+            var script = document.createElement('script');
+            script.setAttribute('type', "text/javascript");
+            script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
+            script.style.opacity = 0;
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
+        };
+    </script>
+</footer>
+</div>
+  </body>
+</html>

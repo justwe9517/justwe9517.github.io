@@ -1,4 +1,264 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-05-02T07:18:51+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">理解 JavaScript 中的 Proxy</title><link href="/javascript/2020/04/01/%E7%90%86%E8%A7%A3-JavaScript-%E4%B8%AD%E7%9A%84-Proxy.html" rel="alternate" type="text/html" title="理解 JavaScript 中的 Proxy" /><published>2020-04-01T15:37:00+00:00</published><updated>2020-04-01T15:37:00+00:00</updated><id>/javascript/2020/04/01/%E7%90%86%E8%A7%A3%20JavaScript%20%E4%B8%AD%E7%9A%84%20Proxy</id><content type="html" xml:base="/javascript/2020/04/01/%E7%90%86%E8%A7%A3-JavaScript-%E4%B8%AD%E7%9A%84-Proxy.html">&lt;h1 id=&quot;理解-javascript-中的-proxy&quot;&gt;理解 JavaScript 中的 Proxy&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-05-02T07:27:20+00:00</updated><id>/feed.xml</id><title type="html">夏虫的博客</title><subtitle>个人博客</subtitle><entry><title type="html">parseInt 中的诡异行为</title><link href="/javascript/2020/04/24/parseInt-%E4%B8%AD%E7%9A%84%E7%89%B9%E6%AE%8A%E8%A1%8C%E4%B8%BA.html" rel="alternate" type="text/html" title="parseInt 中的诡异行为" /><published>2020-04-24T00:00:00+00:00</published><updated>2020-04-24T00:00:00+00:00</updated><id>/javascript/2020/04/24/parseInt%20%E4%B8%AD%E7%9A%84%E7%89%B9%E6%AE%8A%E8%A1%8C%E4%B8%BA</id><content type="html" xml:base="/javascript/2020/04/24/parseInt-%E4%B8%AD%E7%9A%84%E7%89%B9%E6%AE%8A%E8%A1%8C%E4%B8%BA.html">&lt;p&gt;parseInt 是一个将字符串转化为特定进制的函数，函数本身没任何问题，但因为历史遗留问题这个函数总能产生一些意外的行为。&lt;/p&gt;
+
+&lt;p&gt;下面来看看这个函数的定义：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/**
+ * Converts a string to an integer.
+ * @param s A string to convert into a number.
+ * @param radix A value between 2 and 36 that specifies the base of the number in numString.
+ * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
+ * All other strings are considered decimal.
+ */&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;declare&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;parseInt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;radix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在上面的注释中我们得知， redix 接受一个 2 - 36 之前的正数，如果不提供参数则视为十进制。这句话现在看着没有任何问题，但在之前真是这样吗？这类早期的缺陷也是很多面试官很喜欢问的。&lt;/p&gt;
+
+&lt;p&gt;其实在 ECMAScript 3 之前的时代，如果未指定 redix 参数，则会存在两种解析方式。&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;对于以 &lt;code class=&quot;highlighter-rouge&quot;&gt;0x&lt;/code&gt; 或 &lt;code class=&quot;highlighter-rouge&quot;&gt;0X&lt;/code&gt; 开头的字符串，parseInt 会将其按照 16 进制进行解析。&lt;/li&gt;
+  &lt;li&gt;对于以 &lt;code class=&quot;highlighter-rouge&quot;&gt;0&lt;/code&gt; 开头的字符串，parseInt 会将其以 8 进制进行解析。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;对于上面第二点，就很容易产生一些意外问题，例如：如果你在老浏览器中通过执行 &lt;code class=&quot;highlighter-rouge&quot;&gt;parseInt(&quot;070&quot;)&lt;/code&gt; 函数，最后返回出来的结果很可能是 56 而不是 70。对于这类问题在 ECMAScript 5 中已经的得到了解决，解决的方案也很简单，就是彻底移除了上面的 2. 解析规则。&lt;/p&gt;</content><author><name></name></author><category term="javascript" /><category term="笔记" /><summary type="html">parseInt 是一个将字符串转化为特定进制的函数，函数本身没任何问题，但因为历史遗留问题这个函数总能产生一些意外的行为。</summary></entry><entry><title type="html">WeakMap 到底有什么用</title><link href="/javascript/2020/04/15/WeakMap-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8.html" rel="alternate" type="text/html" title="WeakMap 到底有什么用" /><published>2020-04-15T11:45:00+00:00</published><updated>2020-04-15T11:45:00+00:00</updated><id>/javascript/2020/04/15/WeakMap%20%E5%88%B0%E5%BA%95%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8</id><content type="html" xml:base="/javascript/2020/04/15/WeakMap-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8.html">&lt;p&gt;在我最近阅读 vue3.0 源码时我发现其中使用到了 WeakMap 对象，而在此之前我 tm 的居然从来没有关注过这个对象，这也从一方面反映出我的底子有多薄。所以为了方便理解 vue3.0 我查阅了不少的资料，并写了此文方便大家理解 WeakMap 对象。&lt;/p&gt;
+
+&lt;p&gt;WeakMap 在 ES6 中新增的对象。这个对象与 HashMap 类似，也是键值对的合集，并且有一致的操作接口。但是与 HashMap 不同的是 WeakMap 中的键必须是一个对象，而值可以是却可以是任意一个类型。&lt;/p&gt;
+
+&lt;p&gt;以下是 WeakMap 中特有的一些特性&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;WeakMap 使用的弱引用。&lt;/li&gt;
+  &lt;li&gt;WeakMap 中的键值所指的对象如果在其他地方没有引用的时候，就会被 GC 掉。&lt;/li&gt;
+  &lt;li&gt;WeakMap 不可以被枚举，列表状态是否存在取决于 GC 的状态。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;那-weakmap-到底有什么用呢&quot;&gt;那 WeakMap 到底有什么用呢？&lt;/h2&gt;
+
+&lt;p&gt;我们通过下面这段代码来理解一下 WeakMap 的不同之处：&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;weakMap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;WeakMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;elObj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;custom-tags&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;extObj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;weakMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;elObj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;extObj&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;elObj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;现在我来解释一下这段代码的意思，同时在抛出两个个问题，大家在看答案之前自己先思考一下：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;第一行是先创建一个 WeakMap 对象。&lt;/li&gt;
+  &lt;li&gt;第二行是获取一个 HTML 对象。&lt;/li&gt;
+  &lt;li&gt;第三行是创建一个扩展对象，用于对指定元素存储一些数据。&lt;/li&gt;
+  &lt;li&gt;第四行是将 HTML 对象与扩展对象进行绑定。&lt;/li&gt;
+  &lt;li&gt;第五行是将 elObj 变量赋值未空。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;问题：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;在上面的代码中 extObj 变量被释放了吗？&lt;/li&gt;
+  &lt;li&gt;如果将 new WeakMap() 换成 new Map() 有会遇见什么情况。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;好了，自己想想这两个问题，然后我下面公布答案。&lt;/p&gt;
+
+&lt;p&gt;对于第一个问题，答案是 extObj 被释放掉了。原因在于 WeakMap 中的键值是使用的弱引用，也就说在 WeakMap 上的键值并没有真正的被引用，所以如果 elObj 被销毁了，GC 会认为 extObj 没有被任何地方引用，所以在一下 GC 中会被销毁。&lt;/p&gt;
+
+&lt;p&gt;对于第二个问题，如果将 WeakMap 换成 Map 对象，即使你释放掉了 extObj 对象，但 Map 与 extObj 之间仍然是强引用关系，所以 GC 并不会销毁 extObj 变量。为了释放空间，你必须手动调用 &lt;code class=&quot;highlighter-rouge&quot;&gt;weakMap.delete(elObj)&lt;/code&gt; 来释放空间。&lt;/p&gt;
+
+&lt;h2 id=&quot;那什么情况下需要使用到-weakmap-对象&quot;&gt;那什么情况下需要使用到 WeakMap 对象&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;为对象保存一些额外数据，同时不影响对象本身，并且当对象销毁后，自动释放这些额外数据。&lt;/li&gt;
+  &lt;li&gt;基于不可枚举的特性，可以为对象配置私有属性，不过考虑到 &lt;code class=&quot;highlighter-rouge&quot;&gt;es2020&lt;/code&gt; 中已经使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;#&lt;/code&gt; 来设置私有属性，所以这个特点也就不算是什么特点了。&lt;/li&gt;
+&lt;/ol&gt;</content><author><name></name></author><category term="javascript" /><category term="笔记" /><summary type="html">在我最近阅读 vue3.0 源码时我发现其中使用到了 WeakMap 对象，而在此之前我 tm 的居然从来没有关注过这个对象，这也从一方面反映出我的底子有多薄。所以为了方便理解 vue3.0 我查阅了不少的资料，并写了此文方便大家理解 WeakMap 对象。</summary></entry><entry><title type="html">深入研究 Symbol 类型</title><link href="/javascript/2020/04/04/%E6%B7%B1%E5%85%A5%E7%A0%94%E7%A9%B6-Symbol-%E7%B1%BB%E5%9E%8B.html" rel="alternate" type="text/html" title="深入研究 Symbol 类型" /><published>2020-04-04T15:37:00+00:00</published><updated>2020-04-04T15:37:00+00:00</updated><id>/javascript/2020/04/04/%E6%B7%B1%E5%85%A5%E7%A0%94%E7%A9%B6%20Symbol%20%E7%B1%BB%E5%9E%8B</id><content type="html" xml:base="/javascript/2020/04/04/%E6%B7%B1%E5%85%A5%E7%A0%94%E7%A9%B6-Symbol-%E7%B1%BB%E5%9E%8B.html">&lt;h1 id=&quot;深入研究-symbol-类型&quot;&gt;深入研究 Symbol 类型&lt;/h1&gt;
+
+&lt;p&gt;Symbol 是 ES6 中新增加的一种基本数据类型，此类型使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol()&lt;/code&gt; 方式创建，创建出来的值是一个唯一的 symbol 类型值，它有一个比较有意思的特性就是用于为对象创建不可迭代的成员（属性、方法都可以）。除此之外你还可以使用它创建常量。下面让我们来看一看此类型的用途。&lt;/p&gt;
+
+&lt;p&gt;让我们先看看他的类型定义：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;description&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;由此可见，此“对象”接收一个字符串或数字类型的可选参数，用于为 Symbol 定义描述。我之所以在对象上面加了一个引号是因为，Symbol 并非真正意义上的对象，因为它不能被 &lt;code class=&quot;highlighter-rouge&quot;&gt;new&lt;/code&gt; 关键字创建，但通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol()&lt;/code&gt; 创建出来的 symbol 对象可以访问三个属性，分别是 &lt;code class=&quot;highlighter-rouge&quot;&gt;toString()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;valueOf()&lt;/code&gt; 和 ES2019 中新增的 &lt;code class=&quot;highlighter-rouge&quot;&gt;description&lt;/code&gt; 属性。&lt;/p&gt;
+
+&lt;p&gt;下面看一看 Symbol 类型的特点：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tmp1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;// false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;上面的代码中我们创建了两个变量 &lt;code class=&quot;highlighter-rouge&quot;&gt;tmp1&lt;/code&gt; 和 &lt;code class=&quot;highlighter-rouge&quot;&gt;tmp2&lt;/code&gt;，他们分别被赋值成 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol(&quot;tmp&quot;)&lt;/code&gt;，但在进行比较时却返回了 &lt;code class=&quot;highlighter-rouge&quot;&gt;false&lt;/code&gt;，这便是 Symbol 类型最大的特色“唯一性”。那它的作用是什么呢？你可以想想，如果将 Symbol 作为常量的值，你就无需在担心命名重复的问题了。&lt;/p&gt;
+
+&lt;p&gt;接下来让我们再来看看它的类型：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typeof&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// symbol&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过上面的代码我们发现他的类型在预期之内，是一等公民没错。下面让我们看看 Symbol 最具特色的功能。&lt;/p&gt;
+
+&lt;h2 id=&quot;为对象创建不可被枚举的成员&quot;&gt;为对象创建不可被枚举的成员&lt;/h2&gt;
+
+&lt;p&gt;故名思意，你可以通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol(&quot;name&quot;)&lt;/code&gt; 去作为对象键值并为他创建一个不可枚举的成员，不可被枚举就是无法被 &lt;code class=&quot;highlighter-rouge&quot;&gt;for in&lt;/code&gt; 遍历出来的成员。&lt;/p&gt;
+
+&lt;p&gt;让我们从下面这个例子上看一看：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;new Object&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sym&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sym&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;world&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// {tmp: &quot;new Object&quot;, Symbol(hello): &quot;world&quot;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// tmp&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;首先第一行是创建一个对象，第二行是通过 Symbol 为对象添加一个属性。在第三行中，我们通过 console.log 方法打印了 obj 的值，从中看到了一个类型为 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol(hello): &quot;world&quot;&lt;/code&gt; 的属性，第四行中我们又尝试遍历整个对象，发现这个 Symbol 并没有被遍历出来，这说明通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol&lt;/code&gt; 创建的属性确实是无法被枚举的。那有其他办法来访问这个属性吗，有的 &lt;code class=&quot;highlighter-rouge&quot;&gt;console.log(obj[sym])&lt;/code&gt; 通过这种方式就可以了。&lt;/p&gt;
+
+&lt;p&gt;如果你在控制台执行 &lt;code class=&quot;highlighter-rouge&quot;&gt;window.location&lt;/code&gt; 的话，同样能看见 &lt;code class=&quot;highlighter-rouge&quot;&gt;location&lt;/code&gt; 对象中存在一个 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol(Symbol.toPrimitive): undefined&lt;/code&gt; 的属性，关于它的内容，我们放在最后在讲，现在让我们把重点回到 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol&lt;/code&gt; 上。&lt;/p&gt;
+
+&lt;p&gt;在 JavaScript 中，有两种方式可以访问创建的 symbol：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getOwnPropertySymbols&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// [Symbol(hello)]&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;Reflect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ownKeys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;                 &lt;span class=&quot;c1&quot;&gt;// (2) [&quot;tmp&quot;, Symbol(hello)]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;全局-symbol&quot;&gt;全局 Symbol&lt;/h2&gt;
+
+&lt;p&gt;在 Symbol 中存在一个 symbol 注册表，此注册表的作用是为了共享 symbol 的属性到其他页面中。所以创建一个全局 symbol 于创建一个普通 symbol 是不同的。&lt;/p&gt;
+
+&lt;p&gt;Symbol 提供了两个 API 来访问全局注册表，分别是 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol.for()&lt;/code&gt; 和 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol.keyFor()&lt;/code&gt; 方法，它俩的定义如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// 通过 symbol 描述在 symbol 注册表查找 symbol，如果不存在则创建一个&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// 通过 symbol 在 symbol 注册表查找 symbol，如果不存在则返回 undefined&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;keyFor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sym&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;仔细看关于这两个方法的定义，&lt;code class=&quot;highlighter-rouge&quot;&gt;for&lt;/code&gt; 接受的是 &lt;code class=&quot;highlighter-rouge&quot;&gt;string&lt;/code&gt; 类型的数据，而 &lt;code class=&quot;highlighter-rouge&quot;&gt;keyFor&lt;/code&gt; 接受的是 &lt;code class=&quot;highlighter-rouge&quot;&gt;symbol&lt;/code&gt; 类型的数据。&lt;/p&gt;
+
+&lt;p&gt;我们通过下面的例子在了解一下通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol()&lt;/code&gt; 和 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol.for()&lt;/code&gt; 创建的 symbol 有何不同：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// false&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s4&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;可以看到，通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol.for()&lt;/code&gt; 创建的 symbol 是一致的。&lt;/p&gt;
+
+&lt;h2 id=&quot;javascript-内置的-symbols&quot;&gt;JavaScript 内置的 symbols&lt;/h2&gt;
+
+&lt;p&gt;还记得上文提到的 &lt;code class=&quot;highlighter-rouge&quot;&gt;location&lt;/code&gt; 对象中的 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol(Symbol.toPrimitive): undefined&lt;/code&gt; 属性吗，它便是 JavaScript 内置的 symbol 属性。&lt;/p&gt;
+
+&lt;p&gt;JavaScript 提供了非常多的 symbol 用来扩展对象属性：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;类型&lt;/th&gt;
+      &lt;th&gt;属性&lt;/th&gt;
+      &lt;th&gt;描述&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;迭代&lt;/td&gt;
+      &lt;td&gt;Symbol.iterator&lt;/td&gt;
+      &lt;td&gt;一个返回一个对象默认迭代器的方法。被 for…of 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;迭代&lt;/td&gt;
+      &lt;td&gt;Symbol.asyncIterator&lt;/td&gt;
+      &lt;td&gt;一个返回对象默认的异步迭代器的方法。被 for await of 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;正则表达式&lt;/td&gt;
+      &lt;td&gt;Symbol.match&lt;/td&gt;
+      &lt;td&gt;一个用于对字符串进行匹配的方法，也用于确定一个对象是否可以作为正则表达式使用。被 String.prototype.match() 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;正则表达式&lt;/td&gt;
+      &lt;td&gt;Symbol.replace&lt;/td&gt;
+      &lt;td&gt;一个替换匹配字符串的子串的方法. 被 String.prototype.replace() 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;正则表达式&lt;/td&gt;
+      &lt;td&gt;Symbol.search&lt;/td&gt;
+      &lt;td&gt;一个返回一个字符串中与正则表达式相匹配的索引的方法。被String.prototype.search() 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;正则表达式&lt;/td&gt;
+      &lt;td&gt;Symbol.split&lt;/td&gt;
+      &lt;td&gt;一个在匹配正则表达式的索引处拆分一个字符串的方法.。被 String.prototype.split() 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;其他&lt;/td&gt;
+      &lt;td&gt;Symbol.hasInstance&lt;/td&gt;
+      &lt;td&gt;一个确定一个构造器对象识别的对象是否为它的实例的方法。被 instanceof 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;其他&lt;/td&gt;
+      &lt;td&gt;Symbol.isConcatSpreadable&lt;/td&gt;
+      &lt;td&gt;一个布尔值，表明一个对象是否应该flattened为它的数组元素。被 Array.prototype.concat() 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;其他&lt;/td&gt;
+      &lt;td&gt;Symbol.unscopables&lt;/td&gt;
+      &lt;td&gt;拥有和继承属性名的一个对象的值被排除在与环境绑定的相关对象外。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;其他&lt;/td&gt;
+      &lt;td&gt;Symbol.species&lt;/td&gt;
+      &lt;td&gt;一个用于创建派生对象的构造器函数。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;其他&lt;/td&gt;
+      &lt;td&gt;Symbol.toPrimitive&lt;/td&gt;
+      &lt;td&gt;一个将对象转化为基本数据类型的方法。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;其他&lt;/td&gt;
+      &lt;td&gt;Symbol.toStringTag&lt;/td&gt;
+      &lt;td&gt;用于对象的默认描述的字符串值。被 Object.prototype.toString() 使用。&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;关于内置 symbols 的更多信息请参考 &lt;a href=&quot;https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol&quot;&gt;https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol&lt;/a&gt; 此文。&lt;/p&gt;
+
+&lt;p&gt;我这里仅使用 &lt;code class=&quot;highlighter-rouge&quot;&gt;Symbol.iterator&lt;/code&gt; 举一个例子：&lt;/p&gt;
+
+&lt;p&gt;在 es6 中增加了一个新的循环，称为 &lt;code class=&quot;highlighter-rouge&quot;&gt;for of&lt;/code&gt; 循环，一个数组可以直接通过 &lt;code class=&quot;highlighter-rouge&quot;&gt;for of&lt;/code&gt; 进行循环，但一个对象却不行，这是因为对象缺少迭代器，如果想把对象放入 &lt;code class=&quot;highlighter-rouge&quot;&gt;for of&lt;/code&gt; 中进行循环，我们就需要在对象内部实现一个迭代器，告诉 &lt;code class=&quot;highlighter-rouge&quot;&gt;for of&lt;/code&gt; 如何处理数据。&lt;/p&gt;
+
+&lt;p&gt;下面我们花时间来改造一下 &lt;code class=&quot;highlighter-rouge&quot;&gt;obj&lt;/code&gt; 对象：&lt;/p&gt;
+
+&lt;div class=&quot;language-typescript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;new Object&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// 关于迭代器的介绍，我放在以后在说&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;iterator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;propKeys&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Reflect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ownKeys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;propKeys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;propKeys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在实现了这个迭代器后，obj 对象就可以被放入 &lt;code class=&quot;highlighter-rouge&quot;&gt;for of&lt;/code&gt; 中愉快的迭代了。&lt;/p&gt;</content><author><name></name></author><category term="javascript" /><category term="笔记" /><summary type="html">深入研究 Symbol 类型</summary></entry><entry><title type="html">理解 JavaScript 中的 Proxy</title><link href="/javascript/2020/04/01/%E7%90%86%E8%A7%A3-JavaScript-%E4%B8%AD%E7%9A%84-Proxy.html" rel="alternate" type="text/html" title="理解 JavaScript 中的 Proxy" /><published>2020-04-01T15:37:00+00:00</published><updated>2020-04-01T15:37:00+00:00</updated><id>/javascript/2020/04/01/%E7%90%86%E8%A7%A3%20JavaScript%20%E4%B8%AD%E7%9A%84%20Proxy</id><content type="html" xml:base="/javascript/2020/04/01/%E7%90%86%E8%A7%A3-JavaScript-%E4%B8%AD%E7%9A%84-Proxy.html">&lt;h1 id=&quot;理解-javascript-中的-proxy&quot;&gt;理解 JavaScript 中的 Proxy&lt;/h1&gt;
 
 &lt;p&gt;Proxy 是 ES6 中提供的一种新 API，翻译过来就是代理的意思，指代理人帮助委托人处理有关的事务，你可以简单的理解为通过 Proxy 你可以对 Object 中的任何行为并加以修饰，并返回修饰后的数据。&lt;/p&gt;
 

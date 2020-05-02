@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>深入研究 Symbol 类型</title><link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+<body>
+    <div class="container"><header>
+    <div class="menu">
+        <ul style="display: flex; flex: 1;">
+            <li><a href="/">夏虫的博客</a></li>
+        </ul>
+        <ul>
+            <li><a href="/">最新</a></li>
+            <li><a href="/categories.html">分类</a></li>
+            <li><a href="/tags.html">标签</a></li>
+            <li><a href="/collections.html">专题</a></li>
+        </ul>
+    </div>
+</header><main class="main">
+        <style>
+    header {
+        margin-bottom: 0 !important;
+    }
+</style>
+
+<div>
+<h1 id="深入研究-symbol-类型">深入研究 Symbol 类型</h1>
+
+<p>Symbol 是 ES6 中新增加的一种基本数据类型，此类型使用 <code class="highlighter-rouge">Symbol()</code> 方式创建，创建出来的值是一个唯一的 symbol 类型值，它有一个比较有意思的特性就是用于为对象创建不可迭代的成员（属性、方法都可以）。除此之外你还可以使用它创建常量。下面让我们来看一看此类型的用途。</p>
+
+<p>让我们先看看他的类型定义：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Symbol</span><span class="p">(</span><span class="nx">description</span><span class="p">?:</span> <span class="nx">string</span> <span class="o">|</span> <span class="nx">number</span><span class="p">):</span> <span class="nx">symbol</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>由此可见，此“对象”接收一个字符串或数字类型的可选参数，用于为 Symbol 定义描述。我之所以在对象上面加了一个引号是因为，Symbol 并非真正意义上的对象，因为它不能被 <code class="highlighter-rouge">new</code> 关键字创建，但通过 <code class="highlighter-rouge">Symbol()</code> 创建出来的 symbol 对象可以访问三个属性，分别是 <code class="highlighter-rouge">toString()</code>, <code class="highlighter-rouge">valueOf()</code> 和 ES2019 中新增的 <code class="highlighter-rouge">description</code> 属性。</p>
+
+<p>下面看一看 Symbol 类型的特点：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">tmp1</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">(</span><span class="dl">"</span><span class="s2">tmp</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">tmp2</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">(</span><span class="dl">"</span><span class="s2">tmp</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tmp1</span> <span class="o">==</span> <span class="nx">tmp2</span><span class="p">);</span>      <span class="c1">// false</span>
+</code></pre></div></div>
+
+<p>上面的代码中我们创建了两个变量 <code class="highlighter-rouge">tmp1</code> 和 <code class="highlighter-rouge">tmp2</code>，他们分别被赋值成 <code class="highlighter-rouge">Symbol("tmp")</code>，但在进行比较时却返回了 <code class="highlighter-rouge">false</code>，这便是 Symbol 类型最大的特色“唯一性”。那它的作用是什么呢？你可以想想，如果将 Symbol 作为常量的值，你就无需在担心命名重复的问题了。</p>
+
+<p>接下来让我们再来看看它的类型：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">tmp1</span><span class="p">);</span>   <span class="c1">// symbol</span>
+</code></pre></div></div>
+
+<p>通过上面的代码我们发现他的类型在预期之内，是一等公民没错。下面让我们看看 Symbol 最具特色的功能。</p>
+
+<h2 id="为对象创建不可被枚举的成员">为对象创建不可被枚举的成员</h2>
+
+<p>故名思意，你可以通过 <code class="highlighter-rouge">Symbol("name")</code> 去作为对象键值并为他创建一个不可枚举的成员，不可被枚举就是无法被 <code class="highlighter-rouge">for in</code> 遍历出来的成员。</p>
+
+<p>让我们从下面这个例子上看一看：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">tmp</span><span class="p">:</span> <span class="dl">"</span><span class="s2">new Object</span><span class="dl">"</span>
+<span class="p">};</span>
+<span class="kd">let</span> <span class="nx">sym</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">obj</span><span class="p">[</span><span class="nx">sym</span><span class="p">]</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">world</span><span class="dl">"</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>    <span class="c1">// {tmp: "new Object", Symbol(hello): "world"}</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">n</span> <span class="k">in</span> <span class="nx">obj</span><span class="p">)</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>    <span class="c1">// tmp</span>
+</code></pre></div></div>
+
+<p>首先第一行是创建一个对象，第二行是通过 Symbol 为对象添加一个属性。在第三行中，我们通过 console.log 方法打印了 obj 的值，从中看到了一个类型为 <code class="highlighter-rouge">Symbol(hello): "world"</code> 的属性，第四行中我们又尝试遍历整个对象，发现这个 Symbol 并没有被遍历出来，这说明通过 <code class="highlighter-rouge">Symbol</code> 创建的属性确实是无法被枚举的。那有其他办法来访问这个属性吗，有的 <code class="highlighter-rouge">console.log(obj[sym])</code> 通过这种方式就可以了。</p>
+
+<p>如果你在控制台执行 <code class="highlighter-rouge">window.location</code> 的话，同样能看见 <code class="highlighter-rouge">location</code> 对象中存在一个 <code class="highlighter-rouge">Symbol(Symbol.toPrimitive): undefined</code> 的属性，关于它的内容，我们放在最后在讲，现在让我们把重点回到 <code class="highlighter-rouge">Symbol</code> 上。</p>
+
+<p>在 JavaScript 中，有两种方式可以访问创建的 symbol：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Object</span><span class="p">.</span><span class="nx">getOwnPropertySymbols</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>    <span class="c1">// [Symbol(hello)]</span>
+<span class="nb">Reflect</span><span class="p">.</span><span class="nx">ownKeys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>                 <span class="c1">// (2) ["tmp", Symbol(hello)]</span>
+</code></pre></div></div>
+
+<h2 id="全局-symbol">全局 Symbol</h2>
+
+<p>在 Symbol 中存在一个 symbol 注册表，此注册表的作用是为了共享 symbol 的属性到其他页面中。所以创建一个全局 symbol 于创建一个普通 symbol 是不同的。</p>
+
+<p>Symbol 提供了两个 API 来访问全局注册表，分别是 <code class="highlighter-rouge">Symbol.for()</code> 和 <code class="highlighter-rouge">Symbol.keyFor()</code> 方法，它俩的定义如下：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 通过 symbol 描述在 symbol 注册表查找 symbol，如果不存在则创建一个</span>
+<span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="nx">key</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nx">symbol</span><span class="p">;</span>
+<span class="c1">// 通过 symbol 在 symbol 注册表查找 symbol，如果不存在则返回 undefined</span>
+<span class="nb">Symbol</span><span class="p">.</span><span class="nx">keyFor</span><span class="p">(</span><span class="nx">sym</span><span class="p">:</span> <span class="nx">symbol</span><span class="p">):</span> <span class="nx">string</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>仔细看关于这两个方法的定义，<code class="highlighter-rouge">for</code> 接受的是 <code class="highlighter-rouge">string</code> 类型的数据，而 <code class="highlighter-rouge">keyFor</code> 接受的是 <code class="highlighter-rouge">symbol</code> 类型的数据。</p>
+
+<p>我们通过下面的例子在了解一下通过 <code class="highlighter-rouge">Symbol()</code> 和 <code class="highlighter-rouge">Symbol.for()</code> 创建的 symbol 有何不同：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">s1</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">(</span><span class="dl">"</span><span class="s2">symbol</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">s2</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">(</span><span class="dl">"</span><span class="s2">symbol</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">s1</span> <span class="o">==</span> <span class="nx">s2</span><span class="p">);</span>    <span class="c1">// false</span>
+
+<span class="kd">let</span> <span class="nx">s3</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="dl">"</span><span class="s2">symbol</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">s4</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="dl">"</span><span class="s2">symbol</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">s3</span> <span class="o">==</span> <span class="nx">s4</span><span class="p">);</span>    <span class="c1">// true</span>
+</code></pre></div></div>
+
+<p>可以看到，通过 <code class="highlighter-rouge">Symbol.for()</code> 创建的 symbol 是一致的。</p>
+
+<h2 id="javascript-内置的-symbols">JavaScript 内置的 symbols</h2>
+
+<p>还记得上文提到的 <code class="highlighter-rouge">location</code> 对象中的 <code class="highlighter-rouge">Symbol(Symbol.toPrimitive): undefined</code> 属性吗，它便是 JavaScript 内置的 symbol 属性。</p>
+
+<p>JavaScript 提供了非常多的 symbol 用来扩展对象属性：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>类型</th>
+      <th>属性</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>迭代</td>
+      <td>Symbol.iterator</td>
+      <td>一个返回一个对象默认迭代器的方法。被 for…of 使用。</td>
+    </tr>
+    <tr>
+      <td>迭代</td>
+      <td>Symbol.asyncIterator</td>
+      <td>一个返回对象默认的异步迭代器的方法。被 for await of 使用。</td>
+    </tr>
+    <tr>
+      <td>正则表达式</td>
+      <td>Symbol.match</td>
+      <td>一个用于对字符串进行匹配的方法，也用于确定一个对象是否可以作为正则表达式使用。被 String.prototype.match() 使用。</td>
+    </tr>
+    <tr>
+      <td>正则表达式</td>
+      <td>Symbol.replace</td>
+      <td>一个替换匹配字符串的子串的方法. 被 String.prototype.replace() 使用。</td>
+    </tr>
+    <tr>
+      <td>正则表达式</td>
+      <td>Symbol.search</td>
+      <td>一个返回一个字符串中与正则表达式相匹配的索引的方法。被String.prototype.search() 使用。</td>
+    </tr>
+    <tr>
+      <td>正则表达式</td>
+      <td>Symbol.split</td>
+      <td>一个在匹配正则表达式的索引处拆分一个字符串的方法.。被 String.prototype.split() 使用。</td>
+    </tr>
+    <tr>
+      <td>其他</td>
+      <td>Symbol.hasInstance</td>
+      <td>一个确定一个构造器对象识别的对象是否为它的实例的方法。被 instanceof 使用。</td>
+    </tr>
+    <tr>
+      <td>其他</td>
+      <td>Symbol.isConcatSpreadable</td>
+      <td>一个布尔值，表明一个对象是否应该flattened为它的数组元素。被 Array.prototype.concat() 使用。</td>
+    </tr>
+    <tr>
+      <td>其他</td>
+      <td>Symbol.unscopables</td>
+      <td>拥有和继承属性名的一个对象的值被排除在与环境绑定的相关对象外。</td>
+    </tr>
+    <tr>
+      <td>其他</td>
+      <td>Symbol.species</td>
+      <td>一个用于创建派生对象的构造器函数。</td>
+    </tr>
+    <tr>
+      <td>其他</td>
+      <td>Symbol.toPrimitive</td>
+      <td>一个将对象转化为基本数据类型的方法。</td>
+    </tr>
+    <tr>
+      <td>其他</td>
+      <td>Symbol.toStringTag</td>
+      <td>用于对象的默认描述的字符串值。被 Object.prototype.toString() 使用。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>关于内置 symbols 的更多信息请参考 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol">https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol</a> 此文。</p>
+
+<p>我这里仅使用 <code class="highlighter-rouge">Symbol.iterator</code> 举一个例子：</p>
+
+<p>在 es6 中增加了一个新的循环，称为 <code class="highlighter-rouge">for of</code> 循环，一个数组可以直接通过 <code class="highlighter-rouge">for of</code> 进行循环，但一个对象却不行，这是因为对象缺少迭代器，如果想把对象放入 <code class="highlighter-rouge">for of</code> 中进行循环，我们就需要在对象内部实现一个迭代器，告诉 <code class="highlighter-rouge">for of</code> 如何处理数据。</p>
+
+<p>下面我们花时间来改造一下 <code class="highlighter-rouge">obj</code> 对象：</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">tmp</span><span class="p">:</span> <span class="dl">"</span><span class="s2">new Object</span><span class="dl">"</span><span class="p">,</span>
+    <span class="c1">// 关于迭代器的介绍，我放在以后在说</span>
+    <span class="p">[</span><span class="nb">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">propKeys</span> <span class="o">=</span> <span class="nb">Reflect</span><span class="p">.</span><span class="nx">ownKeys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">next</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">propKeys</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">let</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">propKeys</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+                <span class="nx">index</span><span class="o">++</span><span class="p">;</span>
+                <span class="k">return</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]]</span> <span class="p">};</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="p">{</span> <span class="na">done</span><span class="p">:</span> <span class="kc">true</span> <span class="p">};</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>在实现了这个迭代器后，obj 对象就可以被放入 <code class="highlighter-rouge">for of</code> 中愉快的迭代了。</p>
+
+
+
+<hr>
+<div id="gitment-container"></div>
+<script src="/assets/gitment.js"></script>
+<script>
+    var gitment = new Gitment({
+        id: 'article',
+        owner: 'justwe9517',
+        repo: 'justwe9517.github.io.comment',
+        oauth: {
+            client_id: '5478f070853e6da796cb',
+            client_secret: '8e2107cb4181d5ec16429b919b334cf936b289b1',
+        },
+    });
+    gitment.render('gitment-container')
+</script>
+
+</div>
+    </main><footer>
+    <span style="display: flex; flex: 1;" id="travis-ci"></span>
+    <span id="cnzz"></span>
+    COPYRIGHT © 2020. ALL RIGHTS RESERVED.
+    <script>
+        window.onload = function () {
+            var script = document.createElement('script');
+            script.setAttribute('type', "text/javascript");
+            script.setAttribute('src', 'https://v1.cnzz.com/z_stat.php?id=1278709366&web_id=1278709366');
+            script.style.opacity = 0;
+            document.getElementsByTagName("body")[0].appendChild(script);
+            var travisCi = document.createElement('img');
+            travisCi.src = 'https://api.travis-ci.com/justwe9517/justwe9517.github.io.svg?branch=write';
+            document.getElementById("travis-ci").appendChild(travisCi);
+            var cnzz = document.createElement('img');
+            cnzz.style.marginRight = '12px';
+            cnzz.src = 'https://web.umeng.com/static/img/main/icon.gif';
+            document.getElementById("cnzz").appendChild(cnzz);
+        };
+    </script>
+</footer>
+</div>
+  </body>
+</html>
