@@ -1,6 +1,6 @@
 ---
 title: WeakMap 到底有什么用
-date: 2020-04-04 15:37:00 Z
+date: 2020-04-15 11:45:00 Z
 categories:
 - javascript
 tags:
