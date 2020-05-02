@@ -1,0 +1,56 @@
+---
+title: WeakMap 到底有什么用
+date: 2020-04-04 15:37:00 Z
+categories:
+- javascript
+tags:
+- javascript
+- 笔记
+layout: post
+---
+
+在我最近阅读 vue3.0 源码时我发现其中使用到了 WeakMap 对象，而在此之前我 tm 的居然从来没有关注过这个对象，这也从一方面反映出我的底子有多薄。所以为了方便理解 vue3.0 我查阅了不少的资料，并写了此文方便大家理解 WeakMap 对象。
+
+WeakMap 在 ES6 中新增的对象。这个对象与 HashMap 类似，也是键值对的合集，并且有一致的操作接口。但是与 HashMap 不同的是 WeakMap 中的键必须是一个对象，而值可以是却可以是任意一个类型。
+
+以下是 WeakMap 中特有的一些特性
+
+1. WeakMap 使用的弱引用。
+2. WeakMap 中的键值所指的对象如果在其他地方没有引用的时候，就会被 GC 掉。
+3. WeakMap 不可以被枚举，列表状态是否存在取决于 GC 的状态。
+
+## 那 WeakMap 到底有什么用呢？
+
+我们通过下面这段代码来理解一下 WeakMap 的不同之处：
+
+```javascript
+let weakMap = new WeakMap();
+let elObj = document.getElementById("custom-tags");
+let extObj = new Array(1024 * 1024 * 1024);
+weakMap.set(elObj, { extObj });
+elObj = null;
+```
+
+现在我来解释一下这段代码的意思，同时在抛出两个个问题，大家在看答案之前自己先思考一下：
+
+1. 第一行是先创建一个 WeakMap 对象。
+2. 第二行是获取一个 HTML 对象。
+3. 第三行是创建一个扩展对象，用于对指定元素存储一些数据。
+4. 第四行是将 HTML 对象与扩展对象进行绑定。
+5. 第五行是将 elObj 变量赋值未空。
+
+问题：
+
+1. 在上面的代码中 extObj 变量被释放了吗？
+2. 如果将 new WeakMap() 换成 new Map() 有会遇见什么情况。
+
+好了，自己想想这两个问题，然后我下面公布答案。
+
+对于第一个问题，答案是 extObj 被释放掉了。原因在于 WeakMap 中的键值是使用的弱引用，也就说在 WeakMap 上的键值并没有真正的被引用，所以如果 elObj 被销毁了，GC 会认为 extObj 没有被任何地方引用，所以在一下 GC 中会被销毁。
+
+对于第二个问题，如果将 WeakMap 换成 Map 对象，即使你释放掉了 extObj 对象，但 Map 与 extObj 之间仍然是强引用关系，所以 GC 并不会销毁 extObj 变量。为了释放空间，你必须手动调用 `weakMap.delete(elObj)` 来释放空间。
+
+## 那什么情况下需要使用到 WeakMap 对象
+
+1. 为对象保存一些额外数据，同时不影响对象本身，并且当对象销毁后，自动释放这些额外数据。
+2. 基于不可枚举的特性，可以为对象配置私有属性，不过考虑到 `es2020` 中已经使用 `#` 来设置私有属性，所以这个特点也就不算是什么特点了。
