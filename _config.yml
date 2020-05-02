@@ -1,7 +1,6 @@
 ---
 title: 夏虫的博客
 timezone: UTC
-future: true
 collections:
   posts:
     title: Posts
@@ -9,6 +8,7 @@ collections:
   uploads:
     title: Uploads
     output: true
+future: true
 header_pages:
 - tag.md
 - index.md
