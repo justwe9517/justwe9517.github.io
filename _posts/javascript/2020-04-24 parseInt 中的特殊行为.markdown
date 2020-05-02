@@ -1,0 +1,34 @@
+---
+title: parseInt 中的诡异行为
+date: 2020-04-24 00:00:00 Z
+categories:
+- javascript
+tags:
+- javascript
+- 笔记
+layout: post
+---
+
+parseInt 是一个将字符串转化为特定进制的函数，函数本身没任何问题，但因为历史遗留问题这个函数总能产生一些意外的行为。
+
+下面来看看这个函数的定义：
+
+```typescript
+/**
+ * Converts a string to an integer.
+ * @param s A string to convert into a number.
+ * @param radix A value between 2 and 36 that specifies the base of the number in numString.
+ * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
+ * All other strings are considered decimal.
+ */
+declare function parseInt(s: string, radix?: number): number;
+```
+
+在上面的注释中我们得知， redix 接受一个 2 - 36 之前的正数，如果不提供参数则视为十进制。这句话现在看着没有任何问题，但在之前真是这样吗？这类早期的缺陷也是很多面试官很喜欢问的。
+
+其实在 ECMAScript 3 之前的时代，如果未指定 redix 参数，则会存在两种解析方式。
+
+1. 对于以 `0x` 或 `0X` 开头的字符串，parseInt 会将其按照 16 进制进行解析。
+2. 对于以 `0` 开头的字符串，parseInt 会将其以 8 进制进行解析。
+
+对于上面第二点，就很容易产生一些意外问题，例如：如果你在老浏览器中通过执行 `parseInt("070")` 函数，最后返回出来的结果很可能是 56 而不是 70。对于这类问题在 ECMAScript 5 中已经的得到了解决，解决的方案也很简单，就是彻底移除了上面的 2. 解析规则。
